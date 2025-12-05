@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useShop } from "@/contexts/ShopContext";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface HeaderProps {
   onCartOpen: () => void;
@@ -23,7 +24,14 @@ export default function Header({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cartCount, wishlist } = useShop();
 
-  const navItems = ["New Arrivals", "Women", "Men", "Accessories", "Sale"];
+  const navItems = [
+    { label: "Home", href: "/" },
+    { label: "New Arrivals", href: "#" },
+    { label: "Women", href: "#" },
+    { label: "Men", href: "#" },
+    { label: "Blog", href: "/blog" },
+    { label: "Sale", href: "#" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -46,21 +54,22 @@ export default function Header({
           </Button>
 
           {/* Logo */}
-          <div className="flex items-center">
+          <Link href="/" className="flex items-center">
             <h1 className="text-2xl font-bold tracking-tight">
               Fashion<span className="text-primary">Fynds</span>
             </h1>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
-              <button
-                key={item}
+              <Link
+                key={item.label}
+                href={item.href}
                 className="text-sm font-medium transition-colors hover:text-primary"
               >
-                {item}
-              </button>
+                {item.label}
+              </Link>
             ))}
           </nav>
 
@@ -121,13 +130,14 @@ export default function Header({
         <div className="md:hidden border-t">
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-3">
             {navItems.map((item) => (
-              <button
-                key={item}
+              <Link
+                key={item.label}
+                href={item.href}
                 className="text-sm font-medium transition-colors hover:text-primary text-left"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {item}
-              </button>
+                {item.label}
+              </Link>
             ))}
             <Button
               variant="outline"
