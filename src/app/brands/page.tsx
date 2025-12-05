@@ -225,24 +225,24 @@ export default function BrandsPage() {
         
         <main>
           {/* Hero Section */}
-          <section className="relative bg-gradient-to-br from-[#1BA6A6] via-[#007A7A] to-[#00D4D4] text-white py-20 px-4">
+          <section className="relative bg-muted py-20 px-4">
             <div className="max-w-7xl mx-auto text-center">
               <h1 className="text-4xl md:text-6xl font-bold mb-4">
                 Discover Indie Brands
               </h1>
-              <p className="text-lg md:text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl mb-8 text-muted-foreground max-w-2xl mx-auto">
                 Real brands, real stories. Explore authentic creators who dare to be different.
               </p>
               
               {/* Search Bar */}
               <div className="max-w-2xl mx-auto relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search brands by name, style, or vibe..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
+                  className="w-full pl-12 pr-4 py-4 rounded-full bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring shadow-sm"
                 />
               </div>
 
@@ -250,22 +250,22 @@ export default function BrandsPage() {
               <div className="flex flex-wrap justify-center gap-8 mt-12">
                 <div>
                   <div className="text-3xl font-bold">{brands.length}+</div>
-                  <div className="text-sm text-white/80">Indie Brands</div>
+                  <div className="text-sm text-muted-foreground">Indie Brands</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold">500+</div>
-                  <div className="text-sm text-white/80">Unique Products</div>
+                  <div className="text-sm text-muted-foreground">Unique Products</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold">4.8</div>
-                  <div className="text-sm text-white/80">Average Rating</div>
+                  <div className="text-sm text-muted-foreground">Average Rating</div>
                 </div>
               </div>
             </div>
           </section>
 
           {/* Category Filter */}
-          <section className="sticky top-16 bg-white border-b border-gray-200 z-30 shadow-sm">
+          <section className="sticky top-16 bg-background border-b border-border z-30 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 py-4 overflow-x-auto">
               <div className="flex gap-3 min-w-max">
                 {categories.map((category) => (
@@ -274,8 +274,8 @@ export default function BrandsPage() {
                     onClick={() => setActiveCategory(category.id)}
                     className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
                       activeCategory === category.id
-                        ? "bg-[#1BA6A6] text-white shadow-md"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-muted text-foreground hover:bg-muted/80"
                     }`}
                   >
                     {category.name}
@@ -287,17 +287,17 @@ export default function BrandsPage() {
 
           {/* Trending Brands Banner */}
           {activeCategory === "all" && (
-            <section className="bg-gradient-to-r from-[#FFB347] to-[#FF6B6B] py-12 px-4">
+            <section className="bg-accent/10 py-12 px-4">
               <div className="max-w-7xl mx-auto">
                 <div className="flex items-center gap-2 mb-6">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                  <h2 className="text-2xl font-bold text-white">Trending Now</h2>
+                  <TrendingUp className="w-6 h-6 text-primary" />
+                  <h2 className="text-2xl font-bold">Trending Now</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6">
                   {trendingBrands.map((brand) => (
                     <div
                       key={brand.id}
-                      className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+                      className="bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-start gap-4">
                         <img
@@ -307,11 +307,11 @@ export default function BrandsPage() {
                         />
                         <div className="flex-1">
                           <h3 className="font-bold text-lg mb-1">{brand.name}</h3>
-                          <p className="text-sm text-gray-600 mb-2">{brand.tagline}</p>
+                          <p className="text-sm text-muted-foreground mb-2">{brand.tagline}</p>
                           <div className="flex items-center gap-2">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm font-medium">{brand.rating}</span>
-                            <span className="text-sm text-gray-500">({brand.reviews})</span>
+                            <span className="text-sm text-muted-foreground">({brand.reviews})</span>
                           </div>
                         </div>
                       </div>
@@ -323,14 +323,14 @@ export default function BrandsPage() {
           )}
 
           {/* Brands Grid */}
-          <section className="py-16 px-4">
+          <section className="py-16 px-4 bg-background">
             <div className="max-w-7xl mx-auto">
               <div className="flex justify-between items-center mb-8">
                 <div>
                   <h2 className="text-3xl font-bold mb-2">
                     {activeCategory === "all" ? "All Brands" : categories.find(c => c.id === activeCategory)?.name}
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     {filteredBrands.length} {filteredBrands.length === 1 ? "brand" : "brands"} found
                   </p>
                 </div>
@@ -338,13 +338,13 @@ export default function BrandsPage() {
 
               {filteredBrands.length === 0 ? (
                 <div className="text-center py-20">
-                  <p className="text-xl text-gray-500">No brands found matching your criteria.</p>
+                  <p className="text-xl text-muted-foreground">No brands found matching your criteria.</p>
                   <button
                     onClick={() => {
                       setActiveCategory("all");
                       setSearchQuery("");
                     }}
-                    className="mt-4 px-6 py-3 bg-[#1BA6A6] text-white rounded-full hover:bg-[#007A7A] transition-colors"
+                    className="mt-4 px-6 py-3 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors"
                   >
                     Clear Filters
                   </button>
@@ -354,7 +354,7 @@ export default function BrandsPage() {
                   {filteredBrands.map((brand) => (
                     <div
                       key={brand.id}
-                      className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
+                      className="group bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-border"
                     >
                       {/* Brand Image */}
                       <div className="relative h-48 overflow-hidden">
@@ -367,7 +367,7 @@ export default function BrandsPage() {
                         
                         {/* Trending Badge */}
                         {brand.trending && (
-                          <div className="absolute top-4 left-4 bg-[#FF6B6B] text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                          <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                             <TrendingUp className="w-3 h-3" />
                             Trending
                           </div>
@@ -376,13 +376,13 @@ export default function BrandsPage() {
                         {/* Save Button */}
                         <button
                           onClick={() => toggleSaveBrand(brand.id)}
-                          className="absolute top-4 right-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors"
+                          className="absolute top-4 right-4 w-10 h-10 bg-background/90 hover:bg-background rounded-full flex items-center justify-center transition-colors"
                         >
                           <Heart
                             className={`w-5 h-5 ${
                               savedBrands.includes(brand.id)
                                 ? "fill-red-500 text-red-500"
-                                : "text-gray-600"
+                                : "text-muted-foreground"
                             }`}
                           />
                         </button>
@@ -392,27 +392,27 @@ export default function BrandsPage() {
                           <img
                             src={brand.logo}
                             alt={`${brand.name} logo`}
-                            className="w-16 h-16 rounded-lg border-4 border-white shadow-lg object-cover"
+                            className="w-16 h-16 rounded-lg border-4 border-background shadow-lg object-cover"
                           />
                         </div>
                       </div>
 
                       {/* Brand Info */}
                       <div className="p-6">
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-[#1BA6A6] transition-colors">
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                           {brand.name}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-3 italic">{brand.tagline}</p>
-                        <p className="text-sm text-gray-700 mb-4 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mb-3 italic">{brand.tagline}</p>
+                        <p className="text-sm text-foreground mb-4 line-clamp-2">
                           {brand.description}
                         </p>
 
                         {/* Stats */}
-                        <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="font-medium">{brand.rating}</span>
-                            <span className="text-gray-400">({brand.reviews})</span>
+                            <span className="text-muted-foreground/70">({brand.reviews})</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <MapPin className="w-4 h-4" />
@@ -420,13 +420,13 @@ export default function BrandsPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
                           <div>
-                            <div className="text-sm text-gray-500">Products</div>
+                            <div className="text-sm text-muted-foreground">Products</div>
                             <div className="font-bold">{brand.products}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-500">Price Range</div>
+                            <div className="text-sm text-muted-foreground">Price Range</div>
                             <div className="font-bold">{brand.priceRange}</div>
                           </div>
                         </div>
@@ -434,7 +434,7 @@ export default function BrandsPage() {
                         {/* CTA Button */}
                         <Link
                           href="/"
-                          className="block w-full py-3 bg-[#1BA6A6] hover:bg-[#007A7A] text-white text-center rounded-full font-medium transition-colors"
+                          className="block w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground text-center rounded-full font-medium transition-colors"
                         >
                           Explore Brand
                         </Link>
@@ -447,19 +447,19 @@ export default function BrandsPage() {
           </section>
 
           {/* Newsletter CTA */}
-          <section className="bg-gradient-to-r from-[#FF6B6B] to-[#FF8080] py-16 px-4">
-            <div className="max-w-4xl mx-auto text-center text-white">
+          <section className="bg-muted py-16 px-4">
+            <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl font-bold mb-4">Stay Updated on New Brands</h2>
-              <p className="text-lg mb-8 text-white/90">
+              <p className="text-lg mb-8 text-muted-foreground">
                 Be the first to discover emerging indie brands and exclusive drops.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 px-6 py-4 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="flex-1 px-6 py-4 rounded-full bg-background border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-                <button className="px-8 py-4 bg-black hover:bg-gray-900 text-white rounded-full font-medium transition-colors whitespace-nowrap">
+                <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-medium transition-colors whitespace-nowrap">
                   Subscribe
                 </button>
               </div>
