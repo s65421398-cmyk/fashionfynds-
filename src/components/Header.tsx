@@ -27,6 +27,7 @@ export default function Header({
   const navItems = [
     { label: "Home", href: "/" },
     { label: "New Arrivals", href: "#" },
+    { label: "Brands", href: "/brands" },
     { label: "Women", href: "#" },
     { label: "Men", href: "#" },
     { label: "Blog", href: "/blog" },
