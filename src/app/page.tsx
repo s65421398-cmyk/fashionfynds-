@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import TrendingTicker from "@/components/TrendingTicker";
 import TrendingNowBanner from "@/components/TrendingNowBanner";
 import HeroCarousel from "@/components/HeroCarousel";
+import CategoriesSection from "@/components/CategoriesSection";
 import CollectionsSection from "@/components/CollectionsSection";
 import TodaySteals from "@/components/TodaySteals";
 import BrandCarousel from "@/components/BrandCarousel";
@@ -49,6 +50,7 @@ export default function Home() {
           <TrendingTicker />
           <TrendingNowBanner />
           <HeroCarousel />
+          <CategoriesSection />
           <CollectionsSection />
           <TodaySteals onProductClick={handleProductClick} />
           <BrandCarousel />
