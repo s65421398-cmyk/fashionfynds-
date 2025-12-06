@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
+import TrendingTicker from "@/components/TrendingTicker";
+import TrendingNowBanner from "@/components/TrendingNowBanner";
 import HeroCarousel from "@/components/HeroCarousel";
 import CollectionsSection from "@/components/CollectionsSection";
 import TodaySteals from "@/components/TodaySteals";
@@ -44,6 +46,8 @@ export default function Home() {
         />
         
         <main>
+          <TrendingTicker />
+          <TrendingNowBanner />
           <HeroCarousel />
           <CollectionsSection />
           <TodaySteals onProductClick={handleProductClick} />

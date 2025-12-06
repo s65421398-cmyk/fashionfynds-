@@ -124,6 +124,21 @@
   }
 }
 
+/* Marquee animation for trending ticker */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 30s linear infinite;
+}
+
 /* Hide Next.js error overlay portal */
 nextjs-portal {
   display: none !important;
