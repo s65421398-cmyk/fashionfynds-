@@ -9,19 +9,16 @@ const slides = [
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&q=80",
     title: "New Season Arrivals",
     subtitle: "Discover the latest trends",
-    cta: "Shop Now",
   },
   {
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&q=80",
     title: "Summer Collection",
     subtitle: "Up to 50% off select items",
-    cta: "Explore Deals",
   },
   {
     image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&q=80",
     title: "Curated For You",
     subtitle: "Personalized style recommendations",
-    cta: "View Collection",
   },
 ];
 
@@ -57,19 +54,24 @@ export default function HeroCarousel() {
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${slide.image})` }}
           >
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-black/60" />
           </div>
           <div className="relative h-full flex items-center justify-center text-center px-4">
             <div className="max-w-3xl">
-              <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
                 {slide.title}
               </h2>
-              <p className="text-xl md:text-2xl text-white/90 mb-8">
+              <p className="text-xl md:text-2xl text-white mb-8 drop-shadow-md">
                 {slide.subtitle}
               </p>
-              <Button size="lg" className="text-lg px-8">
-                {slide.cta}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="text-lg px-8 shadow-lg">
+                  Explore Brands
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 bg-white/10 text-white border-white hover:bg-white hover:text-black shadow-lg">
+                  Learn More
+                </Button>
+              </div>
             </div>
           </div>
         </div>
