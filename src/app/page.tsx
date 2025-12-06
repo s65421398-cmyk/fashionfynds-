@@ -4,9 +4,11 @@ import { useState } from "react";
 import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
-import FeaturedBrands from "@/components/FeaturedBrands";
-import DealsSection from "@/components/DealsSection";
 import CollectionsSection from "@/components/CollectionsSection";
+import TodaySteals from "@/components/TodaySteals";
+import BrandCarousel from "@/components/BrandCarousel";
+import DealsSection from "@/components/DealsSection";
+import EditorsPicks from "@/components/EditorsPicks";
 import ShopByMovement from "@/components/ShopByMovement";
 import Community from "@/components/Community";
 import Newsletter from "@/components/Newsletter";
@@ -43,9 +45,11 @@ export default function Home() {
         
         <main>
           <HeroCarousel />
-          <FeaturedBrands />
-          <DealsSection onProductClick={handleProductClick} />
           <CollectionsSection />
+          <TodaySteals onProductClick={handleProductClick} />
+          <BrandCarousel />
+          <DealsSection onProductClick={handleProductClick} />
+          <EditorsPicks />
           <ShopByMovement />
           <Community />
           <Newsletter />
