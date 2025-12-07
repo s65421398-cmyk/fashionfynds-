@@ -2,37 +2,44 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const featuredBrands = [
   {
     name: "Nike",
+    slug: "nike",
     logo: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&q=80",
     tagline: "Just Do It",
   },
   {
     name: "Adidas",
+    slug: "adidas",
     logo: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&q=80",
     tagline: "Impossible is Nothing",
   },
   {
     name: "Zara",
+    slug: "zara",
     logo: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80",
     tagline: "Love Your Curves",
   },
   {
     name: "H&M",
+    slug: "h-and-m",
     logo: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&q=80",
     tagline: "Fashion & Quality",
   },
   {
     name: "Levi's",
+    slug: "levis",
     logo: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80",
     tagline: "Original Since 1873",
   },
   {
     name: "Gucci",
+    slug: "gucci",
     logo: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&q=80",
     tagline: "Luxury & Craftsmanship",
   },
@@ -103,21 +110,23 @@ export default function BrandCarousel() {
                   className="flex-shrink-0 px-2 md:px-3"
                   style={{ width: `${100 / itemsPerView}%` }}
                 >
-                  <div className="group relative aspect-square rounded-lg overflow-hidden bg-muted hover:shadow-xl transition-all cursor-pointer">
-                    <img
-                      src={brand.logo}
-                      alt={brand.name}
-                      className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end p-4">
-                      <h3 className="text-xl md:text-2xl font-bold text-white mb-1">
-                        {brand.name}
-                      </h3>
-                      <p className="text-xs text-white/80 text-center">
-                        {brand.tagline}
-                      </p>
+                  <Link href={`/brands/${brand.slug}`}>
+                    <div className="group relative aspect-square rounded-lg overflow-hidden bg-muted hover:shadow-xl transition-all cursor-pointer">
+                      <img
+                        src={brand.logo}
+                        alt={brand.name}
+                        className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end p-4">
+                        <h3 className="text-xl md:text-2xl font-bold text-white mb-1">
+                          {brand.name}
+                        </h3>
+                        <p className="text-xs text-white/80 text-center">
+                          {brand.tagline}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -155,6 +164,16 @@ export default function BrandCarousel() {
               }`}
             />
           ))}
+        </div>
+
+        {/* View All Brands Button */}
+        <div className="text-center mt-8">
+          <Link href="/brands">
+            <Button size="lg" variant="outline" className="hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-all">
+              View All Brands
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

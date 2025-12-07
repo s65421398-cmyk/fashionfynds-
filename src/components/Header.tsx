@@ -35,6 +35,7 @@ export default function Header({
     { label: "Home", href: "/" },
     { label: "New Arrivals", href: "#" },
     { label: "Brands", href: "/brands" },
+    { label: "Collections", href: "/collections" },
     { label: "Women", href: "#" },
     { label: "Men", href: "#" },
   ];
