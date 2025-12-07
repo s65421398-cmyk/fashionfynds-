@@ -21,7 +21,6 @@ import WishlistSheet from "@/components/WishlistSheet";
 import ProductModal from "@/components/ProductModal";
 import SearchModal from "@/components/SearchModal";
 import CheckoutModal from "@/components/CheckoutModal";
-import AuthModal from "@/components/AuthModal";
 import { Product } from "@/types/product";
 
 export default function Home() {
@@ -29,7 +28,6 @@ export default function Home() {
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleProductClick = (product: Product) => {
@@ -43,7 +41,6 @@ export default function Home() {
           onCartOpen={() => setCartOpen(true)}
           onWishlistOpen={() => setWishlistOpen(true)}
           onSearchOpen={() => setSearchOpen(true)}
-          onAuthOpen={() => setAuthOpen(true)}
         />
         
         <main>
@@ -88,7 +85,6 @@ export default function Home() {
           open={checkoutOpen}
           onClose={() => setCheckoutOpen(false)}
         />
-        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
       </div>
     </ShopProvider>
   );
