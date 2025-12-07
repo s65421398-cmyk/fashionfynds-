@@ -3,10 +3,28 @@
 import { Facebook, Instagram, Twitter, Youtube, Mail, Shield, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export default function Footer() {
-  const quickLinks = ["New Arrivals", "Women", "Men", "Accessories", "Sale", "Brands", "Collections"];
-  const legalSupport = ["Help Center", "Shipping & Returns", "Size Guide", "Contact Us", "Track Order", "Privacy Policy", "Terms of Service"];
+  const quickLinks = [
+    { label: "New Arrivals", href: "/categories/new-arrivals" },
+    { label: "Women", href: "/categories/women" },
+    { label: "Men", href: "/categories/men" },
+    { label: "Accessories", href: "/categories/accessories" },
+    { label: "Sale", href: "/categories/sale" },
+    { label: "Brands", href: "/brands" },
+    { label: "Collections", href: "/collections" }
+  ];
+  
+  const legalSupport = [
+    { label: "About Us", href: "/about" },
+    { label: "Contact Us", href: "/contact" },
+    { label: "FAQ / Help Center", href: "/faq" },
+    { label: "Shipping & Returns", href: "/shipping" },
+    { label: "Track Order", href: "/account/orders" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" }
+  ];
 
   return (
     <footer className="bg-muted/50 border-t">
@@ -27,10 +45,10 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
-                <li key={link}>
-                  <button className="text-sm text-muted-foreground hover:text-[#1BA6A6] transition-colors">
-                    {link}
-                  </button>
+                <li key={link.label}>
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-[#1BA6A6] transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -38,13 +56,13 @@ export default function Footer() {
 
           {/* Column 3: Legal & Support */}
           <div>
-            <h4 className="font-semibold mb-4">Legal & Support</h4>
+            <h4 className="font-semibold mb-4">Help & Info</h4>
             <ul className="space-y-2">
               {legalSupport.map((link) => (
-                <li key={link}>
-                  <button className="text-sm text-muted-foreground hover:text-[#1BA6A6] transition-colors">
-                    {link}
-                  </button>
+                <li key={link.label}>
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-[#1BA6A6] transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -86,21 +104,21 @@ export default function Footer() {
               © {new Date().getFullYear()} FashionFynds. All rights reserved.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-              <button className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
+              <Link href="/privacy" className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
                 Privacy
-              </button>
+              </Link>
               <span className="text-muted-foreground">|</span>
-              <button className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
+              <Link href="/terms" className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
                 Terms
-              </button>
+              </Link>
               <span className="text-muted-foreground">|</span>
-              <button className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
-                Cookies
-              </button>
+              <Link href="/shipping" className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
+                Shipping
+              </Link>
               <span className="text-muted-foreground">|</span>
-              <button className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
-                Accessibility
-              </button>
+              <Link href="/contact" className="text-muted-foreground hover:text-[#1BA6A6] transition-colors">
+                Contact
+              </Link>
             </div>
           </div>
 
