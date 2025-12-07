@@ -163,3 +163,21 @@ export const orderItems = sqliteTable('order_items', {
   selectedColor: text('selected_color').notNull(),
   createdAt: text('created_at').notNull(),
 });
+
+// Blog posts table
+export const blogPosts = sqliteTable('blog_posts', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  slug: text('slug').notNull().unique(),
+  excerpt: text('excerpt').notNull(),
+  content: text('content').notNull(),
+  category: text('category').notNull(),
+  authorId: text('author_id').notNull().references(() => user.id),
+  authorName: text('author_name').notNull(),
+  featured: integer('featured', { mode: 'boolean' }).default(false),
+  readTime: text('read_time').notNull(),
+  image: text('image').notNull(),
+  views: integer('views').default(0),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
