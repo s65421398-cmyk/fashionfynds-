@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 
 
 
@@ -65,4 +65,101 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
   ),
+});
+
+// E-commerce tables
+export const categories = sqliteTable('categories', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  image: text('image'),
+  createdAt: text('created_at').notNull(),
+});
+
+export const brands = sqliteTable('brands', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  logo: text('logo'),
+  createdAt: text('created_at').notNull(),
+});
+
+export const products = sqliteTable('products', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  brandId: integer('brand_id').references(() => brands.id),
+  categoryId: integer('category_id').references(() => categories.id),
+  price: real('price').notNull(),
+  originalPrice: real('original_price'),
+  description: text('description'),
+  image: text('image').notNull(),
+  images: text('images', { mode: 'json' }),
+  sizes: text('sizes', { mode: 'json' }),
+  colors: text('colors', { mode: 'json' }),
+  rating: real('rating').default(0),
+  reviews: integer('reviews').default(0),
+  inStock: integer('in_stock', { mode: 'boolean' }).default(true),
+  featured: integer('featured', { mode: 'boolean' }).default(false),
+  deal: integer('deal', { mode: 'boolean' }).default(false),
+  dealDiscount: integer('deal_discount'),
+  dealEndsAt: text('deal_ends_at'),
+  movement: text('movement'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+export const cartItems = sqliteTable('cart_items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  quantity: integer('quantity').notNull(),
+  selectedSize: text('selected_size').notNull(),
+  selectedColor: text('selected_color').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+export const wishlistItems = sqliteTable('wishlist_items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  createdAt: text('created_at').notNull(),
+});
+
+export const orders = sqliteTable('orders', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id),
+  orderNumber: text('order_number').notNull().unique(),
+  status: text('status').notNull().default('pending'),
+  subtotal: real('subtotal').notNull(),
+  shipping: real('shipping').notNull(),
+  tax: real('tax').notNull(),
+  total: real('total').notNull(),
+  shippingName: text('shipping_name').notNull(),
+  shippingEmail: text('shipping_email').notNull(),
+  shippingPhone: text('shipping_phone').notNull(),
+  shippingAddress: text('shipping_address').notNull(),
+  shippingCity: text('shipping_city').notNull(),
+  shippingState: text('shipping_state').notNull(),
+  shippingZip: text('shipping_zip').notNull(),
+  shippingCountry: text('shipping_country').notNull(),
+  paymentMethod: text('payment_method').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+export const orderItems = sqliteTable('order_items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  orderId: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').references(() => products.id),
+  productName: text('product_name').notNull(),
+  productImage: text('product_image').notNull(),
+  quantity: integer('quantity').notNull(),
+  price: real('price').notNull(),
+  selectedSize: text('selected_size').notNull(),
+  selectedColor: text('selected_color').notNull(),
+  createdAt: text('created_at').notNull(),
 });
