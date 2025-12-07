@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingCart, Heart, Search, Menu, X, User, ChevronDown } from "lucide-react";
+import { ShoppingCart, Heart, Search, Menu, X, User, ChevronDown, LogOut, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useShop } from "@/contexts/ShopContext";
@@ -10,23 +10,27 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { authClient, useSession } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 interface HeaderProps {
   onCartOpen: () => void;
   onWishlistOpen: () => void;
   onSearchOpen: () => void;
-  onAuthOpen: () => void;
 }
 
 export default function Header({
   onCartOpen,
   onWishlistOpen,
   onSearchOpen,
-  onAuthOpen,
 }: HeaderProps) {
+  const router = useRouter();
+  const { data: session, refetch } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { cartCount, wishlist } = useShop();
@@ -47,6 +51,18 @@ export default function Header({
     { label: "Kids", href: "#" },
     { label: "Sports", href: "#" },
   ];
+
+  const handleSignOut = async () => {
+    const { error } = await authClient.signOut();
+    if (error?.code) {
+      toast.error("Failed to sign out. Please try again.");
+    } else {
+      localStorage.removeItem("bearer_token");
+      refetch();
+      toast.success("Signed out successfully");
+      router.push("/");
+    }
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,9 +165,54 @@ export default function Header({
               <Search className="h-5 w-5" />
             </Button>
 
-            <Button variant="ghost" size="icon" onClick={onAuthOpen}>
-              <User className="h-5 w-5" />
-            </Button>
+            {/* User Auth Section */}
+            {session?.user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{session.user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {session.user.email}
+                    </p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/account" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      My Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/orders" className="cursor-pointer">
+                      <Package className="mr-2 h-4 w-4" />
+                      Orders
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/login")}
+                className="hidden sm:flex"
+              >
+                Sign In
+              </Button>
+            )}
 
             <Button
               variant="ghost"
@@ -194,6 +255,54 @@ export default function Header({
       {mobileMenuOpen && (
         <div className="md:hidden border-t">
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-3">
+            {session?.user ? (
+              <>
+                <div className="pb-3 border-b">
+                  <p className="text-sm font-medium">{session.user.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {session.user.email}
+                  </p>
+                </div>
+                <Link
+                  href="/account"
+                  className="text-sm font-medium transition-colors hover:text-[#1BA6A6] text-left"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My Account
+                </Link>
+                <Link
+                  href="/account/orders"
+                  className="text-sm font-medium transition-colors hover:text-[#1BA6A6] text-left"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Orders
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-sm font-medium transition-colors hover:text-destructive text-left text-destructive"
+                >
+                  Sign Out
+                </button>
+                <div className="border-t pt-3" />
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="default"
+                  className="justify-start"
+                  onClick={() => {
+                    router.push("/login");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Sign In
+                </Button>
+                <div className="border-t pt-3" />
+              </>
+            )}
             {mainNavItems.map((item) => (
               <Link
                 key={item.label}
