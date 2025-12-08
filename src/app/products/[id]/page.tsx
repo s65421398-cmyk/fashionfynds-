@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ShopProvider, useShop } from "@/contexts/ShopContext";
+import { useAnalytics } from "@/contexts/AnalyticsContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -21,6 +22,7 @@ function ProductDetailContent() {
   const params = useParams();
   const router = useRouter();
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useShop();
+  const { trackEcommerce } = useAnalytics();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState("");
@@ -42,8 +44,22 @@ function ProductDetailContent() {
       setSelectedImage(foundProduct.image);
       setSelectedSize(foundProduct.sizes[0] || "");
       setSelectedColor(foundProduct.colors[0] || "");
+      
+      // Track product view event
+      trackEcommerce('view_item', {
+        items: [{
+          item_id: foundProduct.id,
+          item_name: foundProduct.name,
+          price: foundProduct.price,
+          currency: 'USD',
+          item_brand: foundProduct.brand,
+          item_category: foundProduct.category,
+        }],
+        value: foundProduct.price,
+        currency: 'USD',
+      });
     }
-  }, [params.id]);
+  }, [params.id, trackEcommerce]);
 
   if (!product) {
     return (
