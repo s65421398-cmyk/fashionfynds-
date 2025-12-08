@@ -75,9 +75,11 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      {/* Top banner */}
-      <div className="bg-black text-white text-center py-2 text-sm">
-        Free shipping on orders over $100 | Use code: FYNDS20
+      {/* Top banner with promo code */}
+      <div className="bg-gradient-to-r from-black via-[#1BA6A6] to-black text-white text-center py-2.5 text-sm font-medium">
+        <span className="hidden sm:inline">🎉 Free shipping on orders over $100 | </span>
+        <span className="font-bold">Use code: <span className="text-[#FFD93D] text-base">FYNDS20</span></span>
+        <span className="hidden sm:inline"> for 20% OFF 🎁</span>
       </div>
 
       {/* Main header */}
