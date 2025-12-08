@@ -6,6 +6,7 @@ import { Flame, ChevronRight } from "lucide-react";
 import { products } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { Product } from "@/types/product";
+import Link from "next/link";
 
 interface DealsSectionProps {
   onProductClick: (product: Product) => void;
@@ -28,13 +29,15 @@ export default function DealsSection({ onProductClick }: DealsSectionProps) {
           <p className="text-muted-foreground mb-6">
             Don't miss out on these amazing deals - while supplies last!
           </p>
-          <Button 
-            size="lg"
-            className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white"
-          >
-            View All Deals
-            <ChevronRight className="h-5 w-5 ml-1" />
-          </Button>
+          <Link href="/deals">
+            <Button 
+              size="lg"
+              className="bg-[#FF6B6B] hover:bg-[#FF5252] text-white"
+            >
+              View All Deals
+              <ChevronRight className="h-5 w-5 ml-1" />
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
