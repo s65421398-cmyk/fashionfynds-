@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const slides = [
@@ -24,6 +25,7 @@ const slides = [
 
 export default function HeroCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -65,10 +67,19 @@ export default function HeroCarousel() {
                 {slide.subtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="text-lg px-8 shadow-lg">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8 shadow-lg"
+                  onClick={() => router.push("/explore-brands")}
+                >
                   Explore Brands
                 </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8 bg-white/10 text-white border-white hover:bg-white hover:text-black shadow-lg">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="text-lg px-8 bg-white/10 text-white border-white hover:bg-white hover:text-black shadow-lg"
+                  onClick={() => router.push("/learn-more")}
+                >
                   Learn More
                 </Button>
               </div>
