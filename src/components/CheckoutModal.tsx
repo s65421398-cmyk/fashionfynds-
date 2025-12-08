@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useShop } from "@/contexts/ShopContext";
+import { useAnalytics } from "@/contexts/AnalyticsContext";
 import { toast } from "sonner";
 
 interface CheckoutModalProps {
@@ -16,7 +17,8 @@ interface CheckoutModalProps {
 }
 
 export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
-  const { cartTotal, cartCount, clearCart } = useShop();
+  const { cart, cartTotal, cartCount, clearCart } = useShop();
+  const { trackEcommerce, trackConversion, trackFbEvent } = useAnalytics();
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -42,11 +44,55 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   const tax = cartTotal * 0.08;
   const total = cartTotal + shippingCost + tax;
 
+  const handleInitiateCheckout = () => {
+    // Track checkout initiation
+    trackFbEvent('InitiateCheckout', {
+      value: total,
+      currency: 'USD',
+      num_items: cartCount,
+    });
+    
+    setStep(2);
+  };
+
   const handleSubmitOrder = async () => {
     setIsProcessing(true);
     
     // Simulate payment processing
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    const orderId = `ORDER_${Date.now()}`;
+    
+    // Track purchase across all platforms
+    trackEcommerce('purchase', {
+      items: cart.map(item => ({
+        item_id: item.id,
+        item_name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        currency: 'USD',
+        item_brand: item.brand,
+        item_category: item.category,
+      })),
+      value: total,
+      currency: 'USD',
+      transaction_id: orderId,
+    });
+
+    // Track Google Ads conversion
+    trackConversion('purchase', total);
+
+    // Track form submission
+    trackEcommerce('purchase', {
+      items: cart.map(item => ({
+        item_id: item.id,
+        item_name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      value: total,
+      transaction_id: orderId,
+    });
     
     setIsProcessing(false);
     setStep(3);
@@ -177,7 +223,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               </div>
             </div>
 
-            <Button className="w-full" size="lg" onClick={() => setStep(2)}>
+            <Button className="w-full" size="lg" onClick={handleInitiateCheckout}>
               Continue to Payment
             </Button>
           </div>
