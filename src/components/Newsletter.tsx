@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { Mail, Send, Check, Lock, Gift, Clock, Package, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAnalytics } from "@/contexts/AnalyticsContext";
 import { toast } from "sonner";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { trackEmailEvent, trackFormSubmission } = useAnalytics();
 
   useEffect(() => {
     // Auto-focus email input on page load
@@ -24,6 +26,17 @@ export default function Newsletter() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
+      // Track newsletter signup across all platforms
+      trackEmailEvent('signup', {
+        email_provider: email.split('@')[1],
+        signup_source: 'newsletter_footer',
+      });
+      
+      trackFormSubmission('newsletter', {
+        email_domain: email.split('@')[1],
+        form_location: 'homepage_footer',
+      });
+      
       setIsSubscribed(true);
       toast.success("Check your email for your welcome code!");
     }
