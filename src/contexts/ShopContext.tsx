@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { CartItem, WishlistItem, Product } from "@/types/product";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { useAnalytics } from "@/contexts/AnalyticsContext";
 
 interface ShopContextType {
   cart: CartItem[];
@@ -24,6 +25,7 @@ const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export function ShopProvider({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = useSession();
+  const { trackEcommerce } = useAnalytics();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,6 +153,21 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         if (res.ok) {
           await loadFromDatabase();
           toast.success("Added to cart");
+          
+          // Track add to cart event
+          trackEcommerce('add_to_cart', {
+            items: [{
+              item_id: product.id,
+              item_name: product.name,
+              price: product.price,
+              quantity: 1,
+              currency: 'USD',
+              item_brand: product.brand,
+              item_category: product.category,
+            }],
+            value: product.price,
+            currency: 'USD',
+          });
         } else {
           toast.error("Failed to add to cart");
         }
@@ -183,6 +200,21 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         ];
       });
       toast.success("Added to cart");
+      
+      // Track add to cart event
+      trackEcommerce('add_to_cart', {
+        items: [{
+          item_id: product.id,
+          item_name: product.name,
+          price: product.price,
+          quantity: 1,
+          currency: 'USD',
+          item_brand: product.brand,
+          item_category: product.category,
+        }],
+        value: product.price,
+        currency: 'USD',
+      });
     }
   };
 
