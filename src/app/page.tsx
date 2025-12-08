@@ -5,15 +5,20 @@ import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import TrendingTicker from "@/components/TrendingTicker";
 import TrendingNowBanner from "@/components/TrendingNowBanner";
+import UrgencyBanner from "@/components/UrgencyBanner";
+import PromoCodeBanner from "@/components/PromoCodeBanner";
 import HeroCarousel from "@/components/HeroCarousel";
+import TrustBadges from "@/components/TrustBadges";
 import CategoriesSection from "@/components/CategoriesSection";
 import CollectionsSection from "@/components/CollectionsSection";
 import TodaySteals from "@/components/TodaySteals";
 import BrandCarousel from "@/components/BrandCarousel";
 import DealsSection from "@/components/DealsSection";
+import Testimonials from "@/components/Testimonials";
 import EditorsPicks from "@/components/EditorsPicks";
 import ShopByMovement from "@/components/ShopByMovement";
 import Community from "@/components/Community";
+import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -21,6 +26,8 @@ import WishlistSheet from "@/components/WishlistSheet";
 import ProductModal from "@/components/ProductModal";
 import SearchModal from "@/components/SearchModal";
 import CheckoutModal from "@/components/CheckoutModal";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
+import LiveChatWidget from "@/components/LiveChatWidget";
 import { Product } from "@/types/product";
 
 export default function Home() {
@@ -44,17 +51,22 @@ export default function Home() {
         />
         
         <main>
+          <UrgencyBanner />
           <TrendingTicker />
           <TrendingNowBanner />
           <HeroCarousel />
+          <PromoCodeBanner />
+          <TrustBadges />
           <CategoriesSection />
           <CollectionsSection />
           <TodaySteals onProductClick={handleProductClick} />
           <BrandCarousel />
           <DealsSection onProductClick={handleProductClick} />
+          <Testimonials />
           <EditorsPicks />
           <ShopByMovement />
           <Community />
+          <FAQ />
           <Newsletter />
         </main>
 
@@ -85,6 +97,10 @@ export default function Home() {
           open={checkoutOpen}
           onClose={() => setCheckoutOpen(false)}
         />
+
+        {/* Conversion Optimization Components */}
+        <ExitIntentPopup />
+        <LiveChatWidget />
       </div>
     </ShopProvider>
   );
