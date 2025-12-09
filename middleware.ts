@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
 
-export async function middleware(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request);
+export function middleware(request: NextRequest) {
+  // Check for better-auth session cookie (manual check due to Next.js 15 Edge Runtime issues)
+  const hasSession = request.cookies.has("better-auth.session_token");
   
   // Redirect to login if no session cookie found
-  if (!sessionCookie) {
+  if (!hasSession) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
