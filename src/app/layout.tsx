@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import FacebookPixel from '@/components/trackers/FacebookPixel';
 import HotjarTracker from '@/components/trackers/HotjarTracker';
+import ScrollDepthTracker from '@/components/trackers/ScrollDepthTracker';
 import CookieConsent from '@/components/CookieConsent';
 import { AnalyticsProvider } from '@/contexts/AnalyticsContext';
 import PageTracker from '@/components/trackers/PageTracker';
@@ -53,6 +54,7 @@ export default function RootLayout({
         {/* Analytics Provider wraps all tracking utilities */}
         <AnalyticsProvider>
           <PageTracker />
+          <ScrollDepthTracker />
           
           {/* Google Analytics 4 */}
           {process.env.NEXT_PUBLIC_GA4_ID && (
