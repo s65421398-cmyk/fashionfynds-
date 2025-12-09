@@ -93,6 +93,41 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
       value: total,
       transaction_id: orderId,
     });
+
+    // Send order confirmation email
+    try {
+      const emailResponse = await fetch('/api/emails/send-order-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: shippingInfo.email,
+          orderNumber: orderId,
+          customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+          orderDate: new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+          totalAmount: total,
+          items: cart.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zipCode}`,
+        }),
+      });
+
+      const emailResult = await emailResponse.json();
+      
+      if (!emailResult.success) {
+        console.warn('Order confirmation email failed:', emailResult.error);
+        // Don't block the order, just log the error
+      }
+    } catch (emailError) {
+      console.error('Failed to send order confirmation email:', emailError);
+      // Don't block the order on email failure
+    }
     
     setIsProcessing(false);
     setStep(3);
