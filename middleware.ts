@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getSessionCookie } from "better-auth/cookies";
 
 export async function middleware(request: NextRequest) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const sessionCookie = getSessionCookie(request);
   
-  // Redirect to login if no session found
-  if (!session?.user) {
+  // Redirect to login if no session cookie found
+  if (!sessionCookie) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -16,5 +15,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/account", "/account/orders", "/account/profile"],
+  matcher: ["/account", "/account/:path*", "/admin", "/admin/:path*"],
 };
