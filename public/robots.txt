@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fashionfynds.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /account/
+
+# Allow search engines to crawl product pages
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals
+Allow: /collections
