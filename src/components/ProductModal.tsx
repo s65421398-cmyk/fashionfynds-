@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Heart, Star, ShoppingCart, Minus, Plus, Check } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Product } from "@/types/product";
 import { useShop } from "@/contexts/ShopContext";
+import { useAnalytics } from "@/contexts/AnalyticsContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -19,10 +20,36 @@ interface ProductModalProps {
 
 export default function ProductModal({ product, open, onClose }: ProductModalProps) {
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useShop();
+  const { trackEcommerce, trackEvent } = useAnalytics();
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [currentImage, setCurrentImage] = useState(0);
+
+  // Track product view when modal opens
+  useEffect(() => {
+    if (open && product) {
+      trackEcommerce('view_item', {
+        items: [{
+          item_id: product.id,
+          item_name: product.name,
+          price: product.price,
+          currency: 'USD',
+          item_brand: product.brand,
+          item_category: product.category,
+        }],
+        value: product.price,
+        currency: 'USD',
+      });
+
+      trackEvent('product_view', {
+        product_id: product.id,
+        product_name: product.name,
+        product_category: product.category,
+        product_price: product.price,
+      });
+    }
+  }, [open, product, trackEcommerce, trackEvent]);
 
   if (!product) return null;
 
