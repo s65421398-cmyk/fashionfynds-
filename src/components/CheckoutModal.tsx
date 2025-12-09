@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Check } from "lucide-react";
+import { CreditCard, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,227 +18,148 @@ interface CheckoutModalProps {
 
 export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   const { cart, cartTotal, cartCount, clearCart } = useShop();
-  const { trackEcommerce, trackConversion, trackFbEvent } = useAnalytics();
-  const [step, setStep] = useState(1);
+  const { trackEcommerce, trackFbEvent } = useAnalytics();
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const [shippingInfo, setShippingInfo] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
-  });
-
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardNumber: "",
-    cardName: "",
-    expiryDate: "",
-    cvv: "",
-  });
+  const [customerEmail, setCustomerEmail] = useState("");
 
   const shippingCost = cartTotal > 100 ? 0 : 9.99;
   const tax = cartTotal * 0.08;
   const total = cartTotal + shippingCost + tax;
 
-  const handleInitiateCheckout = () => {
-    // Track checkout initiation
-    trackFbEvent('InitiateCheckout', {
-      value: total,
-      currency: 'USD',
-      num_items: cartCount,
-    });
-    
-    setStep(2);
-  };
+  const handleStripeCheckout = async () => {
+    if (!customerEmail) {
+      toast.error("Please enter your email address");
+      return;
+    }
 
-  const handleSubmitOrder = async () => {
+    if (!customerEmail.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     setIsProcessing(true);
-    
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    const orderId = `ORDER_${Date.now()}`;
-    
-    // Track purchase across all platforms
-    trackEcommerce('purchase', {
-      items: cart.map(item => ({
-        item_id: item.id,
-        item_name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        currency: 'USD',
-        item_brand: item.brand,
-        item_category: item.category,
-      })),
-      value: total,
-      currency: 'USD',
-      transaction_id: orderId,
-    });
 
-    // Track Google Ads conversion
-    trackConversion('purchase', total);
-
-    // Track form submission
-    trackEcommerce('purchase', {
-      items: cart.map(item => ({
-        item_id: item.id,
-        item_name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-      })),
-      value: total,
-      transaction_id: orderId,
-    });
-
-    // Send order confirmation email
     try {
-      const emailResponse = await fetch('/api/emails/send-order-confirmation', {
+      // Track checkout initiation
+      trackFbEvent('InitiateCheckout', {
+        value: total,
+        currency: 'USD',
+        num_items: cartCount,
+      });
+
+      trackEcommerce('begin_checkout', {
+        items: cart.map(item => ({
+          item_id: item.id,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          currency: 'USD',
+          item_brand: item.brand,
+          item_category: item.category,
+        })),
+        value: total,
+        currency: 'USD',
+      });
+
+      // Create Stripe checkout session
+      const response = await fetch('/api/checkout/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: shippingInfo.email,
-          orderNumber: orderId,
-          customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
-          orderDate: new Date().toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          }),
-          totalAmount: total,
           items: cart.map(item => ({
             name: item.name,
-            quantity: item.quantity,
             price: item.price,
+            quantity: item.quantity,
+            brand: item.brand,
+            image: item.image,
           })),
-          shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zipCode}`,
+          customerEmail,
+          metadata: {
+            cartCount: cartCount.toString(),
+            subtotal: cartTotal.toFixed(2),
+          },
         }),
       });
 
-      const emailResult = await emailResponse.json();
-      
-      if (!emailResult.success) {
-        console.warn('Order confirmation email failed:', emailResult.error);
-        // Don't block the order, just log the error
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
       }
-    } catch (emailError) {
-      console.error('Failed to send order confirmation email:', emailError);
-      // Don't block the order on email failure
+
+      const { url } = await response.json();
+
+      if (!url) {
+        throw new Error('No checkout URL received');
+      }
+
+      // Handle iframe compatibility - open in new tab
+      const isInIframe = window.self !== window.top;
+      if (isInIframe) {
+        window.parent.postMessage(
+          { type: "OPEN_EXTERNAL_URL", data: { url } },
+          "*"
+        );
+        toast.success("Opening Stripe Checkout in new tab...");
+      } else {
+        // Redirect to Stripe Checkout
+        window.location.href = url;
+      }
+
+      // Clear cart on redirect (will only happen if redirect succeeds)
+      setTimeout(() => {
+        clearCart();
+      }, 1000);
+
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error("Failed to start checkout. Please try again.");
+      setIsProcessing(false);
     }
-    
-    setIsProcessing(false);
-    setStep(3);
-    clearCart();
-    
-    setTimeout(() => {
-      toast.success("Order placed successfully!");
+  };
+
+  const handleClose = () => {
+    if (!isProcessing) {
       onClose();
-      setStep(1);
-    }, 3000);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Checkout</DialogTitle>
+          <DialogTitle className="text-2xl">Secure Checkout</DialogTitle>
         </DialogHeader>
 
-        {step === 1 && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Shipping Information</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={shippingInfo.firstName}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, firstName: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={shippingInfo.lastName}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, lastName: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={shippingInfo.email}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, email: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={shippingInfo.address}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, address: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    value={shippingInfo.city}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, city: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="state">State</Label>
-                  <Input
-                    id="state"
-                    value={shippingInfo.state}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, state: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="zipCode">ZIP Code</Label>
-                  <Input
-                    id="zipCode"
-                    value={shippingInfo.zipCode}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, zipCode: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    value={shippingInfo.country}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, country: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+        <div className="space-y-6">
+          <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">
+              🔒 Secure payment powered by Stripe
+            </p>
+            <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+              Your payment information is encrypted and secure
+            </p>
+          </div>
 
-            <Separator />
+          <div>
+            <Label htmlFor="email">Email Address *</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              disabled={isProcessing}
+              className="mt-1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              We'll send your order confirmation here
+            </p>
+          </div>
 
-            <div className="space-y-2">
+          <Separator />
+
+          <div>
+            <h3 className="font-semibold mb-3">Order Summary</h3>
+            <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Subtotal ({cartCount} items)</span>
                 <span>${cartTotal.toFixed(2)}</span>
@@ -248,7 +169,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                 <span>{shippingCost === 0 ? "FREE" : `$${shippingCost.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between">
-                <span>Tax</span>
+                <span>Estimated Tax</span>
                 <span>${tax.toFixed(2)}</span>
               </div>
               <Separator />
@@ -257,120 +178,54 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                 <span>${total.toFixed(2)}</span>
               </div>
             </div>
+          </div>
 
-            <Button className="w-full" size="lg" onClick={handleInitiateCheckout}>
-              Continue to Payment
+          <div className="space-y-3">
+            <Button 
+              className="w-full" 
+              size="lg" 
+              onClick={handleStripeCheckout}
+              disabled={isProcessing || !customerEmail}
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  Continue to Payment
+                </>
+              )}
             </Button>
-          </div>
-        )}
 
-        {step === 2 && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="cardName">Cardholder Name</Label>
-                  <Input
-                    id="cardName"
-                    value={paymentInfo.cardName}
-                    onChange={(e) =>
-                      setPaymentInfo({ ...paymentInfo, cardName: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input
-                    id="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    value={paymentInfo.cardNumber}
-                    onChange={(e) =>
-                      setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="expiryDate">Expiry Date</Label>
-                    <Input
-                      id="expiryDate"
-                      placeholder="MM/YY"
-                      value={paymentInfo.expiryDate}
-                      onChange={(e) =>
-                        setPaymentInfo({ ...paymentInfo, expiryDate: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cvv">CVV</Label>
-                    <Input
-                      id="cvv"
-                      placeholder="123"
-                      value={paymentInfo.cvv}
-                      onChange={(e) =>
-                        setPaymentInfo({ ...paymentInfo, cvv: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="bg-muted p-4 rounded-lg space-y-1">
-              <p className="font-medium">Order Summary</p>
-              <p className="text-sm text-muted-foreground">
-                {cartCount} items • ${cartTotal.toFixed(2)}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Shipping to: {shippingInfo.city}, {shippingInfo.state}
-              </p>
-            </div>
-
-            <div className="flex justify-between text-lg font-bold">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>
-                Back
-              </Button>
-              <Button
-                className="flex-1"
-                size="lg"
-                onClick={handleSubmitOrder}
-                disabled={isProcessing}
-              >
-                {isProcessing ? (
-                  "Processing..."
-                ) : (
-                  <>
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Place Order
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-              <Check className="h-8 w-8 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-bold mb-2">Order Placed Successfully!</h3>
-            <p className="text-muted-foreground mb-4">
-              Thank you for your purchase. We'll send you a confirmation email shortly.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Order Total: ${total.toFixed(2)}
+            <p className="text-xs text-center text-muted-foreground">
+              By proceeding, you agree to our Terms of Service and Privacy Policy
             </p>
           </div>
-        )}
+
+          <div className="bg-muted p-4 rounded-lg">
+            <h4 className="font-medium text-sm mb-2">Items in your cart:</h4>
+            <div className="space-y-2">
+              {cart.slice(0, 3).map((item) => (
+                <div key={item.id} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground truncate flex-1">
+                    {item.name} × {item.quantity}
+                  </span>
+                  <span className="font-medium ml-2">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </span>
+                </div>
+              ))}
+              {cart.length > 3 && (
+                <p className="text-xs text-muted-foreground">
+                  +{cart.length - 3} more items
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
