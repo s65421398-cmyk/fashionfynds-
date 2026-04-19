@@ -1,52 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { cartItems, products, session, user } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { cartItems, products } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
-async function authenticateRequest(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  
-  const token = authHeader.substring(7);
-  
-  try {
-    const sessionResult = await db
-      .select({ userId: session.userId })
-      .from(session)
-      .where(eq(session.token, token))
-      .limit(1);
-    
-    if (sessionResult.length === 0) {
-      return null;
-    }
-    
-    const now = new Date();
-    const sessionData = await db
-      .select({
-        userId: session.userId,
-        expiresAt: session.expiresAt,
-      })
-      .from(session)
-      .where(eq(session.token, token))
-      .limit(1);
-    
-    if (sessionData.length === 0 || new Date(sessionData[0].expiresAt) < now) {
-      return null;
-    }
-    
-    return { id: sessionResult[0].userId };
-  } catch (error) {
-    console.error('Authentication error:', error);
-    return null;
-  }
+async function authenticateRequest() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  return session?.user ?? null;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const user = await authenticateRequest(request);
+    const user = await authenticateRequest();
     
     if (!user) {
       return NextResponse.json(
@@ -80,17 +46,14 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(items, { status: 200 });
   } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error: ' + (error instanceof Error ? error.message : 'Unknown error') },
-      { status: 500 }
-    );
+    console.error('GET /api/cart error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request);
+    const user = await authenticateRequest();
     
     if (!user) {
       return NextResponse.json(
@@ -103,10 +66,7 @@ export async function POST(request: NextRequest) {
     
     if ('userId' in body || 'user_id' in body) {
       return NextResponse.json(
-        {
-          error: 'User ID cannot be provided in request body',
-          code: 'USER_ID_NOT_ALLOWED',
-        },
+        { error: 'User ID cannot be provided in request body', code: 'USER_ID_NOT_ALLOWED' },
         { status: 400 }
       );
     }
@@ -171,10 +131,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(newCartItem[0], { status: 201 });
   } catch (error) {
-    console.error('POST error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error: ' + (error instanceof Error ? error.message : 'Unknown error') },
-      { status: 500 }
-    );
+    console.error('POST /api/cart error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

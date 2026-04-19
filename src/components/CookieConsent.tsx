@@ -15,12 +15,22 @@ export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    const storedConsent = localStorage.getItem('cookie-consent');
-    if (storedConsent) {
-      setConsent(JSON.parse(storedConsent));
-      updateGTMConsent(JSON.parse(storedConsent));
-    } else {
-      // Show banner after 1 second delay
+    try {
+      const storedConsent = localStorage.getItem('cookie-consent');
+      if (storedConsent) {
+        const parsed = JSON.parse(storedConsent);
+        if (parsed && typeof parsed.analytics === 'boolean') {
+          setConsent(parsed);
+          updateGTMConsent(parsed);
+        } else {
+          localStorage.removeItem('cookie-consent');
+          setTimeout(() => setShowBanner(true), 1000);
+        }
+      } else {
+        setTimeout(() => setShowBanner(true), 1000);
+      }
+    } catch {
+      localStorage.removeItem('cookie-consent');
       setTimeout(() => setShowBanner(true), 1000);
     }
   }, []);

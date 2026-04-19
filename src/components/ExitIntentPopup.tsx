@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { X, Gift, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { toast } from "sonner";
 
 export default function ExitIntentPopup() {
@@ -47,8 +48,11 @@ export default function ExitIntentPopup() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
-        <button
+<DialogContent className="sm:max-w-md p-0 overflow-hidden">
+          <VisuallyHidden>
+            <DialogTitle>Special Offer</DialogTitle>
+          </VisuallyHidden>
+          <button
           onClick={() => setIsOpen(false)}
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10"
         >

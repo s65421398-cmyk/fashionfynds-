@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -136,7 +135,6 @@ export default function BlogDetailPage() {
 
   if (isLoading) {
     return (
-      <ShopProvider>
         <div className="min-h-screen bg-background">
           <Header
             onCartOpen={() => setCartOpen(true)}
@@ -159,14 +157,12 @@ export default function BlogDetailPage() {
             </div>
           </main>
           <Footer />
-        </div>
-      </ShopProvider>
+        </div>
     );
   }
 
   if (error || !post) {
     return (
-      <ShopProvider>
         <div className="min-h-screen bg-background">
           <Header
             onCartOpen={() => setCartOpen(true)}
@@ -185,13 +181,11 @@ export default function BlogDetailPage() {
             </div>
           </main>
           <Footer />
-        </div>
-      </ShopProvider>
+        </div>
     );
   }
 
   return (
-    <ShopProvider>
       <div className="min-h-screen bg-background">
         <Header
           onCartOpen={() => setCartOpen(true)}
@@ -425,7 +419,6 @@ export default function BlogDetailPage() {
           onClose={() => setCheckoutOpen(false)}
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-      </div>
-    </ShopProvider>
+      </div>
   );
 }

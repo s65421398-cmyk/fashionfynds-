@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -90,7 +89,7 @@ export default function TermsPage() {
     {
       id: "governing-law",
       title: "14. Governing Law and Dispute Resolution",
-      content: `These Terms shall be governed by and construed in accordance with the laws of the State of New York, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of the Site shall be resolved through binding arbitration in New York, NY, except that we may seek injunctive relief in any court of competent jurisdiction. You waive any right to a jury trial or to participate in a class action.`
+      content: `These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of the Site shall be resolved through binding arbitration in Mumbai, Maharashtra, except that we may seek injunctive relief in any court of competent jurisdiction. You waive any right to a jury trial or to participate in a class action.`
     },
     {
       id: "termination",
@@ -105,7 +104,6 @@ export default function TermsPage() {
   ];
 
   return (
-    <ShopProvider>
       <div className="min-h-screen bg-background">
         <Header
           onCartOpen={() => setCartOpen(true)}
@@ -116,7 +114,7 @@ export default function TermsPage() {
 
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="bg-gradient-to-br from-teal-50 to-white py-12 border-b">
+          <section className="bg-linear-to-br from-teal-50 to-white py-12 border-b">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto text-center">
                 <Scale className="w-12 h-12 text-[#1BA6A6] mx-auto mb-4" />
@@ -156,7 +154,7 @@ export default function TermsPage() {
           <section className="py-8 bg-orange-50 border-b border-orange-200">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto flex gap-4">
-                <AlertTriangle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-1" />
+                <AlertTriangle className="w-6 h-6 text-orange-600 shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-orange-900 mb-2">Important Notice</h3>
                   <p className="text-sm text-orange-800 leading-relaxed">
@@ -187,9 +185,9 @@ export default function TermsPage() {
                 </div>
 
                 {/* Contact Section */}
-                <div className="mt-16 p-8 bg-gradient-to-br from-teal-50 to-white rounded-2xl border">
+                <div className="mt-16 p-8 bg-linear-to-br from-teal-50 to-white rounded-2xl border">
                   <div className="flex gap-4">
-                    <FileText className="w-8 h-8 text-[#1BA6A6] flex-shrink-0" />
+                    <FileText className="w-8 h-8 text-[#1BA6A6] shrink-0" />
                     <div>
                       <h3 className="font-bold mb-2">Questions About These Terms?</h3>
                       <p className="text-sm text-muted-foreground mb-4">
@@ -204,7 +202,7 @@ export default function TermsPage() {
                           </a>
                         </p>
                         <p>
-                          <span className="font-medium">Address:</span> 123 Fashion Avenue, New York, NY 10001
+                          <span className="font-medium">Address:</span> 123 Fashion Avenue, Mumbai, MH 400001
                         </p>
                       </div>
                     </div>
@@ -215,7 +213,7 @@ export default function TermsPage() {
           </section>
 
           {/* Related Links */}
-          <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
+          <section className="py-16 bg-linear-to-br from-gray-50 to-white">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto">
                 <h2 className="text-2xl font-bold text-center mb-8">Related Policies</h2>
@@ -278,7 +276,6 @@ export default function TermsPage() {
           onClose={() => setCheckoutOpen(false)}
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-      </div>
-    </ShopProvider>
+      </div>
   );
 }

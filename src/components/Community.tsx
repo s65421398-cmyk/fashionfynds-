@@ -3,37 +3,38 @@
 import { Instagram, Users, Heart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 const instagramPosts = [
   {
     id: 1,
     image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80",
     likes: 234,
-    username: "@sarah_styles",
+    username: "@anjali_styles",
   },
   {
     id: 2,
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80",
     likes: 189,
-    username: "@fashion_nova",
+    username: "@mumbai_fashionista",
   },
   {
     id: 3,
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80",
     likes: 312,
-    username: "@style_maven",
+    username: "@delhi_diva",
   },
   {
     id: 4,
     image: "https://images.unsplash.com/photo-1479064555552-3ef4979f8908?w=600&q=80",
     likes: 156,
-    username: "@trendy_fits",
+    username: "@desi_trends",
   },
 ];
 
 export default function Community() {
   return (
-    <section className="py-20 bg-gradient-to-br from-[#1BA6A6] to-[#158A8A] text-white relative overflow-hidden">
+    <section className="py-20 bg-linear-to-br from-[#1BA6A6] to-[#158A8A] text-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
@@ -74,27 +75,32 @@ export default function Community() {
             </div>
           </div>
           
-          <Button 
-            size="lg"
-            className="bg-white text-[#1BA6A6] hover:bg-white/90 font-semibold text-lg px-8 shadow-xl"
-          >
-            <Instagram className="h-5 w-5 mr-2" />
-            Follow @fashionfynds
-          </Button>
+            <Link href="https://www.instagram.com/fashionfyndsofficial?igsh=MWR6cDNyZzRza2c3dg==" target="_blank" rel="noopener noreferrer">
+              <Button 
+                size="lg"
+                className="bg-white text-[#1BA6A6] hover:bg-white/90 font-semibold text-lg px-8 shadow-xl"
+              >
+                <Instagram className="h-5 w-5 mr-2" />
+                Follow @fashionfynds
+              </Button>
+            </Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {instagramPosts.map((post) => (
-            <div
+            <Link
               key={post.id}
-              className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all"
+              href="https://www.instagram.com/fashionfyndsofficial?igsh=MWR6cDNyZzRza2c3dg=="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all block"
             >
               <img
                 src={post.image}
                 alt="Instagram post"
                 className="w-full h-full object-cover transition-transform group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
                 <Instagram className="h-10 w-10 text-white mb-3" />
                 <div className="text-white text-center">
                   <p className="font-semibold text-lg mb-1">
@@ -104,7 +110,7 @@ export default function Community() {
                   <p className="text-sm text-white/80">{post.username}</p>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

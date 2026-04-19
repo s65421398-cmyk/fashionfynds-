@@ -147,6 +147,7 @@ export const orders = sqliteTable('orders', {
   shippingZip: text('shipping_zip').notNull(),
   shippingCountry: text('shipping_country').notNull(),
   paymentMethod: text('payment_method').notNull(),
+  paymentScreenshot: text('payment_screenshot'), // base64 or URL of UPI screenshot
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
@@ -180,4 +181,43 @@ export const blogPosts = sqliteTable('blog_posts', {
   views: integer('views').default(0),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
+});
+
+// Partner applications table
+export const partnerApplications = sqliteTable('partner_applications', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  brandName: text('brand_name').notNull(),
+  contactName: text('contact_name').notNull(),
+  email: text('email').notNull(),
+  phone: text('phone').notNull(),
+  website: text('website'),
+  category: text('category').notNull(),
+  description: text('description').notNull(),
+  instagram: text('instagram'),
+  productsCount: text('products_count'),
+  established: text('established'),
+  status: text('status').notNull().default('pending'), // pending | approved | rejected
+  adminNotes: text('admin_notes'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// Contact form messages
+export const contactMessages = sqliteTable('contact_messages', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  subject: text('subject').notNull(),
+  message: text('message').notNull(),
+  status: text('status').notNull().default('unread'), // unread | read | replied
+  createdAt: text('created_at').notNull(),
+});
+
+// Newsletter subscribers
+export const newsletterSubscribers = sqliteTable('newsletter_subscribers', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  source: text('source').default('footer'), // footer | popup | etc.
+  active: integer('active', { mode: 'boolean' }).default(true),
+  createdAt: text('created_at').notNull(),
 });

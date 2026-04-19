@@ -39,6 +39,7 @@ import {
   XCircle,
   Clock,
   Loader2,
+  Smartphone,
 } from "lucide-react";
 
 interface Order {
@@ -59,6 +60,7 @@ interface Order {
   shippingZip: string;
   shippingCountry: string;
   paymentMethod: string;
+  paymentScreenshot?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -75,6 +77,7 @@ interface OrderItem {
 
 interface OrderWithItems extends Order {
   items: OrderItem[];
+  paymentScreenshot?: string | null;
 }
 
 function OrdersContent() {
@@ -159,6 +162,8 @@ function OrdersContent() {
     switch (status) {
       case "pending":
         return <Clock className="w-4 h-4" />;
+      case "pending_verification":
+        return <Smartphone className="w-4 h-4" />;
       case "processing":
         return <Package className="w-4 h-4" />;
       case "shipped":
@@ -176,6 +181,8 @@ function OrdersContent() {
     switch (status) {
       case "pending":
         return "bg-yellow-500/20 text-yellow-400 border-yellow-500/50";
+      case "pending_verification":
+        return "bg-orange-500/20 text-orange-400 border-orange-500/50";
       case "processing":
         return "bg-blue-500/20 text-blue-400 border-blue-500/50";
       case "shipped":
@@ -228,12 +235,13 @@ function OrdersContent() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a24] border-white/10">
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="shipped">Shipped</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="pending_verification">Awaiting Verification</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="shipped">Shipped</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
               <Button
@@ -309,13 +317,15 @@ function OrdersContent() {
                         </span>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge
-                          variant="outline"
-                          className={`${getStatusColor(order.status)}`}
-                        >
-                          {getStatusIcon(order.status)}
-                          <span className="ml-1 capitalize">{order.status}</span>
-                        </Badge>
+                          <Badge
+                            variant="outline"
+                            className={`${getStatusColor(order.status)}`}
+                          >
+                            {getStatusIcon(order.status)}
+                            <span className="ml-1 capitalize">
+                              {order.status === "pending_verification" ? "Verify UPI" : order.status}
+                            </span>
+                          </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -342,18 +352,13 @@ function OrdersContent() {
                               )}
                             </SelectTrigger>
                             <SelectContent className="bg-[#1a1a24] border-white/10">
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="processing">
-                                Processing
-                              </SelectItem>
-                              <SelectItem value="shipped">Shipped</SelectItem>
-                              <SelectItem value="delivered">
-                                Delivered
-                              </SelectItem>
-                              <SelectItem value="cancelled">
-                                Cancelled
-                              </SelectItem>
-                            </SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="pending_verification">Awaiting Verification</SelectItem>
+                                <SelectItem value="processing">Processing</SelectItem>
+                                <SelectItem value="shipped">Shipped</SelectItem>
+                                <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                              </SelectContent>
                           </Select>
                         </div>
                       </TableCell>
@@ -384,15 +389,15 @@ function OrdersContent() {
           ) : selectedOrder ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <Badge
-                  variant="outline"
-                  className={`${getStatusColor(selectedOrder.status)}`}
-                >
-                  {getStatusIcon(selectedOrder.status)}
-                  <span className="ml-1 capitalize">
-                    {selectedOrder.status}
-                  </span>
-                </Badge>
+                  <Badge
+                    variant="outline"
+                    className={`${getStatusColor(selectedOrder.status)}`}
+                  >
+                    {getStatusIcon(selectedOrder.status)}
+                    <span className="ml-1 capitalize">
+                      {selectedOrder.status === "pending_verification" ? "Verify UPI" : selectedOrder.status}
+                    </span>
+                  </Badge>
                 <span className="text-sm text-white/50">
                   {formatDate(selectedOrder.createdAt)}
                 </span>
@@ -458,7 +463,44 @@ function OrdersContent() {
                 </div>
               </div>
 
-              <div className="border-t border-white/10 pt-4 space-y-2">
+                <div className="border-t border-white/10 pt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/60">Payment</span>
+                      <span className="text-white font-mono text-xs">
+                        {selectedOrder.paymentMethod.startsWith("upi_manual")
+                          ? "UPI Manual"
+                          : selectedOrder.paymentMethod}
+                      </span>
+                    </div>
+
+                    {/* Payment screenshot */}
+                    {selectedOrder.paymentScreenshot && (
+                      <div className="mt-2">
+                        <p className="text-xs text-white/60 mb-2">Payment Screenshot</p>
+                        <img
+                          src={selectedOrder.paymentScreenshot}
+                          alt="Payment screenshot"
+                          className="w-full max-h-64 object-contain rounded-lg border border-white/10 bg-white/5 cursor-pointer"
+                          onClick={() => window.open(selectedOrder.paymentScreenshot!, "_blank")}
+                        />
+                        <p className="text-xs text-white/40 mt-1">Click to view full size</p>
+                      </div>
+                    )}
+
+                    {/* WhatsApp confirm button */}
+                    {selectedOrder.paymentMethod.startsWith("upi_manual") && (
+                      <a
+                        href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "")}?text=${encodeURIComponent(
+                          `Hi ${selectedOrder.shippingName}! 🎉 Your order ${selectedOrder.orderNumber} has been confirmed. Amount: ₹${selectedOrder.total.toFixed(0)}. We will ship your items soon and share the tracking details. Thank you for shopping with FashionFynds! 🛍️`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full mt-3 bg-green-600 hover:bg-green-500 text-white rounded-lg py-2.5 text-sm font-medium transition-colors"
+                      >
+                        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Confirm Order on WhatsApp
+                      </a>
+                    )}
                 <div className="flex justify-between text-sm">
                   <span className="text-white/60">Subtotal</span>
                   <span className="text-white">

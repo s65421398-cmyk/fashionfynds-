@@ -1,48 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { wishlistItems, products, session } from '@/db/schema';
+import { wishlistItems, products } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
-async function authenticateRequest(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  
-  const token = authHeader.substring(7);
-  
-  try {
-    const sessionRecord = await db.select()
-      .from(session)
-      .where(eq(session.token, token))
-      .limit(1);
-    
-    if (sessionRecord.length === 0) {
-      return null;
-    }
-    
-    const userSession = sessionRecord[0];
-    
-    if (new Date(userSession.expiresAt) < new Date()) {
-      return null;
-    }
-    
-    return { id: userSession.userId };
-  } catch (error) {
-    console.error('Authentication error:', error);
-    return null;
-  }
+async function authenticateRequest() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  return session?.user ?? null;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const user = await authenticateRequest(request);
+    const user = await authenticateRequest();
     if (!user) {
-      return NextResponse.json({ 
-        error: 'Authentication required',
-        code: 'UNAUTHORIZED' 
-      }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required', code: 'UNAUTHORIZED' }, { status: 401 });
     }
 
     const items = await db.select({
@@ -71,39 +43,28 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(items, { status: 200 });
   } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error as Error).message 
-    }, { status: 500 });
+    console.error('GET /api/wishlist error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request);
+    const user = await authenticateRequest();
     if (!user) {
-      return NextResponse.json({ 
-        error: 'Authentication required',
-        code: 'UNAUTHORIZED' 
-      }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required', code: 'UNAUTHORIZED' }, { status: 401 });
     }
 
     const body = await request.json();
 
     if ('userId' in body || 'user_id' in body) {
-      return NextResponse.json({ 
-        error: "User ID cannot be provided in request body",
-        code: "USER_ID_NOT_ALLOWED" 
-      }, { status: 400 });
+      return NextResponse.json({ error: "User ID cannot be provided in request body", code: "USER_ID_NOT_ALLOWED" }, { status: 400 });
     }
 
     const { productId } = body;
 
     if (!productId) {
-      return NextResponse.json({ 
-        error: "Product ID is required",
-        code: "MISSING_PRODUCT_ID" 
-      }, { status: 400 });
+      return NextResponse.json({ error: "Product ID is required", code: "MISSING_PRODUCT_ID" }, { status: 400 });
     }
 
     const product = await db.select()
@@ -112,10 +73,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (product.length === 0) {
-      return NextResponse.json({ 
-        error: "Product not found",
-        code: "PRODUCT_NOT_FOUND" 
-      }, { status: 404 });
+      return NextResponse.json({ error: "Product not found", code: "PRODUCT_NOT_FOUND" }, { status: 404 });
     }
 
     const existingItem = await db.select()
@@ -127,25 +85,20 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (existingItem.length > 0) {
-      return NextResponse.json({ 
-        error: "Product already in wishlist",
-        code: "DUPLICATE_ITEM" 
-      }, { status: 400 });
+      return NextResponse.json({ error: "Product already in wishlist", code: "DUPLICATE_ITEM" }, { status: 400 });
     }
 
     const newItem = await db.insert(wishlistItems)
       .values({
         userId: user.id,
-        productId: productId,
+        productId,
         createdAt: new Date().toISOString(),
       })
       .returning();
 
     return NextResponse.json(newItem[0], { status: 201 });
   } catch (error) {
-    console.error('POST error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error as Error).message 
-    }, { status: 500 });
+    console.error('POST /api/wishlist error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

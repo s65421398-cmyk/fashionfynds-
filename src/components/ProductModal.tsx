@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { X, Heart, Star, ShoppingCart, Minus, Plus, Check } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Product } from "@/types/product";
 import { useShop } from "@/contexts/ShopContext";
 import { useAnalytics } from "@/contexts/AnalyticsContext";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
+import SizeGuide from "@/components/SizeGuide";
+import StockNotification from "@/components/StockNotification";
 
 interface ProductModalProps {
   product: Product | null;
@@ -88,8 +91,11 @@ export default function ProductModal({ product, open, onClose }: ProductModalPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        <div className="grid md:grid-cols-2 gap-6 p-6">
+<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          <VisuallyHidden>
+            <DialogTitle>{product.name}</DialogTitle>
+          </VisuallyHidden>
+          <div className="grid md:grid-cols-2 gap-6 p-6">
           {/* Image Gallery */}
           <div>
             <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 mb-4">
@@ -177,11 +183,11 @@ export default function ProductModal({ product, open, onClose }: ProductModalPro
               {/* Price */}
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-3xl font-bold">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
                 {product.originalPrice && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ${product.originalPrice.toFixed(2)}
+                    {formatPrice(product.originalPrice)}
                   </span>
                 )}
               </div>
@@ -193,9 +199,12 @@ export default function ProductModal({ product, open, onClose }: ProductModalPro
 
             {/* Size Selection */}
             <div>
-              <label className="text-sm font-semibold mb-2 block">
-                Size: {selectedSize && <span className="font-normal">{selectedSize}</span>}
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold">
+                  Size: {selectedSize && <span className="font-normal">{selectedSize}</span>}
+                </label>
+                <SizeGuide />
+              </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                   <Button
@@ -268,15 +277,22 @@ export default function ProductModal({ product, open, onClose }: ProductModalPro
             <Separator />
 
             {/* Add to Cart Button */}
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={handleAddToCart}
-              disabled={!product.inStock}
-            >
-              <ShoppingCart className="h-5 w-5 mr-2" />
-              Add to Cart - ${(product.price * quantity).toFixed(2)}
-            </Button>
+            {product.inStock ? (
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleAddToCart}
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Add to Cart - {formatPrice(product.price * quantity)}
+              </Button>
+            ) : (
+              <StockNotification 
+                product={product}
+                selectedSize={selectedSize}
+                selectedColor={selectedColor}
+              />
+            )}
 
             {/* Product Info */}
             <div className="space-y-2 text-sm">
@@ -292,7 +308,7 @@ export default function ProductModal({ product, open, onClose }: ProductModalPro
               )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Free Shipping</span>
-                <span className="font-medium">Orders over $100</span>
+                <span className="font-medium">Orders over ₹8,300</span>
               </div>
             </div>
           </div>

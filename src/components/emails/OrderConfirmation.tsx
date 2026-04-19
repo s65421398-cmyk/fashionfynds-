@@ -28,14 +28,14 @@ interface OrderConfirmationProps {
   shippingAddress: string;
 }
 
-export const OrderConfirmationEmail: React.FC<OrderConfirmationProps> = ({
+export const OrderConfirmationEmail = ({
   orderNumber,
   orderDate,
   customerName,
   items,
   totalAmount,
   shippingAddress,
-}) => {
+}: OrderConfirmationProps) => {
   const formattedTotal = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",

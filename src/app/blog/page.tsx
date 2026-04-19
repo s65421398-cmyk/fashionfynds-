@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -90,7 +89,6 @@ export default function BlogPage() {
   };
 
   return (
-    <ShopProvider>
       <div className="min-h-screen bg-background">
         <Header
           onCartOpen={() => setCartOpen(true)}
@@ -109,7 +107,7 @@ export default function BlogPage() {
                   Fashion Insights
                 </Badge>
                 <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                  The Fashion<span className="text-primary">Fynds</span> Blog
+                  The Fashion<span className="text-white">Fynds</span> Blog
                 </h1>
                 <p className="text-xl text-gray-300 mb-8">
                   Real stories, style inspiration, and insider tips from the world of indie fashion.
@@ -365,6 +363,5 @@ export default function BlogPage() {
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
       </div>
-    </ShopProvider>
   );
 }

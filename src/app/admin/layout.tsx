@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
   X,
   LogOut,
   ChevronDown,
+  Handshake,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,6 +32,7 @@ const navigation = [
   { name: "Inventory", href: "/admin/inventory", icon: Package },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Customers", href: "/admin/customers", icon: Users },
+  { name: "Partners", href: "/admin/partners", icon: Handshake },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
@@ -41,6 +44,12 @@ export default function AdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -167,10 +176,10 @@ export default function AdminLayout({
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-white/80 hover:text-white focus:text-white focus:bg-white/5">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign out
-                </DropdownMenuItem>
+                  <DropdownMenuItem className="text-white/80 hover:text-white focus:text-white focus:bg-white/5" onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign out
+                  </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

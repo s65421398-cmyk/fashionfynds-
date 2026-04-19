@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useShop } from "@/contexts/ShopContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { formatPrice } from "@/lib/utils";
 
 interface ShoppingCartProps {
   open: boolean;
@@ -116,7 +117,7 @@ export default function ShoppingCart({ open, onClose, onCheckout }: ShoppingCart
                           </Button>
                         </div>
                         <span className="font-semibold">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {formatPrice(item.price * item.quantity)}
                         </span>
                       </div>
                     </div>
@@ -129,19 +130,22 @@ export default function ShoppingCart({ open, onClose, onCheckout }: ShoppingCart
               <div className="space-y-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                  <span className="font-medium">{formatPrice(cartTotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="font-medium">
-                    {cartTotal > 100 ? "FREE" : "$9.99"}
+                    {cartTotal > 999 ? "FREE" : formatPrice(99)}
                   </span>
                 </div>
+                {cartTotal <= 999 && (
+                  <p className="text-xs text-muted-foreground">Free shipping on orders over ₹999</p>
+                )}
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
                   <span>
-                    ${(cartTotal + (cartTotal > 100 ? 0 : 9.99)).toFixed(2)}
+                    {formatPrice(cartTotal + (cartTotal > 999 ? 0 : 99))}
                   </span>
                 </div>
                 <Button

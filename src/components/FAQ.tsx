@@ -8,7 +8,7 @@ import Link from "next/link";
 const faqs = [
   {
     question: "How long does shipping take?",
-    answer: "Standard shipping takes 5-7 business days. Express shipping (2-3 days) is available for an additional fee. Free shipping on orders over $100!",
+    answer: "Standard shipping across India takes 4-7 business days. Express shipping (2-3 days) is available for an additional fee. Free shipping on orders over ₹999!",
   },
   {
     question: "What's your return policy?",

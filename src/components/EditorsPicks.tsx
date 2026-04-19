@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const editorsPicks = [
   {
@@ -83,14 +84,16 @@ export default function EditorsPicks() {
                   {pick.story}
                 </p>
 
-                <Button
-                  variant="secondary"
-                  size={pick.featured ? "lg" : "default"}
-                  className="translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all"
-                >
-                  Read Story
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
+                  <Link href="/blog">
+                    <Button
+                      variant="secondary"
+                      size={pick.featured ? "lg" : "default"}
+                      className="transition-all"
+                    >
+                      Read Story
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
               </div>
             </div>
           ))}

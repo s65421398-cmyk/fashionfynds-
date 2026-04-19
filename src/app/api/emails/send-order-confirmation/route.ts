@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { OrderConfirmationEmail } from "@/components/emails/OrderConfirmation";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy123456789");
 
 interface OrderItem {
   name: string;

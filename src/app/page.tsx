@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import TrendingTicker from "@/components/TrendingTicker";
 import TrendingNowBanner from "@/components/TrendingNowBanner";
@@ -28,6 +27,10 @@ import SearchModal from "@/components/SearchModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LiveChatWidget from "@/components/LiveChatWidget";
+import BackToTop from "@/components/BackToTop";
+import RecentlyViewed from "@/components/RecentlyViewed";
+import CompareProducts from "@/components/CompareProducts";
+import { addToRecentlyViewed } from "@/components/RecentlyViewed";
 import { Product } from "@/types/product";
 
 export default function Home() {
@@ -38,70 +41,72 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleProductClick = (product: Product) => {
+    addToRecentlyViewed(product);
     setSelectedProduct(product);
   };
 
   return (
-    <ShopProvider>
-      <div className="min-h-screen bg-background">
-        <Header
-          onCartOpen={() => setCartOpen(true)}
-          onWishlistOpen={() => setWishlistOpen(true)}
-          onSearchOpen={() => setSearchOpen(true)}
-        />
-        
-        <main>
-          <UrgencyBanner />
-          <TrendingTicker />
-          <TrendingNowBanner />
-          <HeroCarousel />
-          <PromoCodeBanner />
-          <TrustBadges />
-          <CategoriesSection />
-          <CollectionsSection />
-          <TodaySteals onProductClick={handleProductClick} />
-          <BrandCarousel />
-          <DealsSection onProductClick={handleProductClick} />
-          <Testimonials />
-          <EditorsPicks />
-          <ShopByMovement />
-          <Community />
-          <FAQ />
-          <Newsletter />
-        </main>
+    <div className="min-h-screen bg-background">
+      <Header
+        onCartOpen={() => setCartOpen(true)}
+        onWishlistOpen={() => setWishlistOpen(true)}
+        onSearchOpen={() => setSearchOpen(true)}
+      />
+      
+      <main>
+        <UrgencyBanner />
+        <TrendingTicker />
+        <TrendingNowBanner />
+        <HeroCarousel />
+        <PromoCodeBanner />
+        <TrustBadges />
+        <CategoriesSection />
+        <CollectionsSection />
+        <TodaySteals onProductClick={handleProductClick} />
+        <BrandCarousel />
+        <DealsSection onProductClick={handleProductClick} />
+        <Testimonials />
+        <EditorsPicks />
+        <ShopByMovement />
+        <RecentlyViewed onProductClick={handleProductClick} />
+        <Community />
+        <FAQ />
+        <Newsletter />
+      </main>
 
-        <Footer />
+      <Footer />
 
-        {/* Modals and Sheets */}
-        <ShoppingCart
-          open={cartOpen}
-          onClose={() => setCartOpen(false)}
-          onCheckout={() => setCheckoutOpen(true)}
-        />
-        <WishlistSheet
-          open={wishlistOpen}
-          onClose={() => setWishlistOpen(false)}
-          onProductClick={handleProductClick}
-        />
-        <ProductModal
-          product={selectedProduct}
-          open={!!selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-        />
-        <SearchModal
-          open={searchOpen}
-          onClose={() => setSearchOpen(false)}
-          onProductSelect={handleProductClick}
-        />
-        <CheckoutModal
-          open={checkoutOpen}
-          onClose={() => setCheckoutOpen(false)}
-        />
+      {/* Modals and Sheets */}
+      <ShoppingCart
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        onCheckout={() => setCheckoutOpen(true)}
+      />
+      <WishlistSheet
+        open={wishlistOpen}
+        onClose={() => setWishlistOpen(false)}
+        onProductClick={handleProductClick}
+      />
+      <ProductModal
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
+      <SearchModal
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onProductSelect={handleProductClick}
+      />
+      <CheckoutModal
+        open={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+      />
 
-        {/* Conversion Optimization Components */}
-        <ExitIntentPopup />
-        <LiveChatWidget />
-      </div>
-    </ShopProvider>
+      {/* Conversion Optimization Components */}
+      <ExitIntentPopup />
+      <LiveChatWidget />
+      <BackToTop />
+      <CompareProducts onProductClick={handleProductClick} />
+    </div>
   );
 }

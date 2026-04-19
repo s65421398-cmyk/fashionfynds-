@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -195,7 +194,7 @@ Your continued use of our services after changes are posted constitutes acceptan
 
 Email: privacy@fashionfynds.com
 Phone: +1 (555) 123-4567
-Mail: Privacy Team, FashionFynds, 123 Fashion Avenue, New York, NY 10001
+Mail: Privacy Team, FashionFynds, 123 Fashion Avenue, Mumbai, MH 400001
 
 To request deletion of your data, email us with "Data Deletion Request" in the subject line. We will respond within 30 days and process your request in accordance with applicable laws.`
     }
@@ -225,7 +224,6 @@ To request deletion of your data, email us with "Data Deletion Request" in the s
   ];
 
   return (
-    <ShopProvider>
       <div className="min-h-screen bg-background">
         <Header
           onCartOpen={() => setCartOpen(true)}
@@ -236,7 +234,7 @@ To request deletion of your data, email us with "Data Deletion Request" in the s
 
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="bg-gradient-to-br from-teal-50 to-white py-12 border-b">
+          <section className="bg-linear-to-br from-teal-50 to-white py-12 border-b">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto text-center">
                 <Shield className="w-12 h-12 text-[#1BA6A6] mx-auto mb-4" />
@@ -261,7 +259,7 @@ To request deletion of your data, email us with "Data Deletion Request" in the s
                     return (
                       <div
                         key={index}
-                        className="bg-gradient-to-br from-teal-50 to-white rounded-xl p-6 border text-center"
+                        className="bg-linear-to-br from-teal-50 to-white rounded-xl p-6 border text-center"
                       >
                         <Icon className="w-8 h-8 text-[#1BA6A6] mx-auto mb-3" />
                         <h3 className="font-bold mb-2 text-sm">{item.title}</h3>
@@ -304,7 +302,7 @@ To request deletion of your data, email us with "Data Deletion Request" in the s
                     return (
                       <div key={section.id} id={section.id} className="scroll-mt-28">
                         <div className="flex items-start gap-4 mb-4">
-                          <Icon className="w-6 h-6 text-[#1BA6A6] flex-shrink-0 mt-1" />
+                          <Icon className="w-6 h-6 text-[#1BA6A6] shrink-0 mt-1" />
                           <h2 className="text-2xl font-bold text-[#1BA6A6]">
                             {section.title}
                           </h2>
@@ -321,7 +319,7 @@ To request deletion of your data, email us with "Data Deletion Request" in the s
           </section>
 
           {/* Contact CTA */}
-          <section className="py-16 bg-gradient-to-r from-[#1BA6A6] to-teal-600 text-white">
+          <section className="py-16 bg-linear-to-r from-[#1BA6A6] to-teal-600 text-white">
             <div className="container mx-auto px-4">
               <div className="max-w-2xl mx-auto text-center">
                 <h2 className="text-3xl font-bold mb-4">Questions About Your Privacy?</h2>
@@ -367,7 +365,6 @@ To request deletion of your data, email us with "Data Deletion Request" in the s
           onClose={() => setCheckoutOpen(false)}
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-      </div>
-    </ShopProvider>
+      </div>
   );
 }

@@ -1,47 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { cartItems, session } from '@/db/schema';
+import { cartItems } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
-async function authenticateRequest(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.substring(7);
-
-  try {
-    const sessionRecord = await db
-      .select()
-      .from(session)
-      .where(eq(session.token, token))
-      .limit(1);
-
-    if (sessionRecord.length === 0) {
-      return null;
-    }
-
-    const userSession = sessionRecord[0];
-
-    if (new Date(userSession.expiresAt) < new Date()) {
-      return null;
-    }
-
-    return userSession.userId;
-  } catch (error) {
-    console.error('Authentication error:', error);
-    return null;
-  }
+async function authenticateRequest() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  return session?.user?.id ?? null;
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await authenticateRequest(request);
+    const userId = await authenticateRequest();
     
     if (!userId) {
       return NextResponse.json(
@@ -50,7 +24,7 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json(
@@ -84,7 +58,7 @@ export async function PUT(
     const body = await request.json();
     const { quantity, selectedSize, selectedColor } = body;
 
-    const updates: Record<string, any> = {
+    const updates: Record<string, unknown> = {
       updatedAt: new Date().toISOString()
     };
 
@@ -143,10 +117,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await authenticateRequest(request);
+    const userId = await authenticateRequest();
     
     if (!userId) {
       return NextResponse.json(
@@ -155,7 +129,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json(
@@ -199,10 +173,7 @@ export async function DELETE(
     }
 
     return NextResponse.json(
-      {
-        message: 'Cart item deleted successfully',
-        deletedItem: deletedCartItem[0]
-      },
+      { message: 'Cart item deleted successfully', deletedItem: deletedCartItem[0] },
       { status: 200 }
     );
   } catch (error) {

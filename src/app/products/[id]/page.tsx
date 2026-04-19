@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ShopProvider, useShop } from "@/contexts/ShopContext";
+import { useShop } from "@/contexts/ShopContext";
 import { useAnalytics } from "@/contexts/AnalyticsContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,6 +12,7 @@ import ProductModal from "@/components/ProductModal";
 import SearchModal from "@/components/SearchModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import AuthModal from "@/components/AuthModal";
+import { ProductSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { Product } from "@/types/product";
 import { products } from "@/lib/products";
 import { Star, Heart, ShoppingCart as CartIcon, Truck, Shield, RotateCcw, ChevronLeft, Check } from "lucide-react";
@@ -102,6 +103,16 @@ function ProductDetailContent() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Structured Data for SEO */}
+      <ProductSchema product={product} />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: process.env.NEXT_PUBLIC_SITE_URL || "https://fashionfynds.com" },
+          { name: product.category, url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://fashionfynds.com"}/categories/${product.category.toLowerCase()}` },
+          { name: product.name, url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://fashionfynds.com"}/products/${product.id}` },
+        ]}
+      />
+      
       <Header
         onCartOpen={() => setCartOpen(true)}
         onWishlistOpen={() => setWishlistOpen(true)}
@@ -424,8 +435,6 @@ function ProductDetailContent() {
 
 export default function ProductDetailPage() {
   return (
-    <ShopProvider>
-      <ProductDetailContent />
-    </ShopProvider>
+      <ProductDetailContent />
   );
 }

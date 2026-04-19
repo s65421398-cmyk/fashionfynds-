@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
 
 interface Category {
@@ -32,6 +32,7 @@ interface Brand {
 export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -294,7 +295,43 @@ export default function NewProductPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-white/70">Image URL *</Label>
+                  <Label className="text-white/70">Upload Image</Label>
+                  <label className="mt-1 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-amber-500/50 hover:bg-white/5 transition-all">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploading(true);
+                        try {
+                          const fd = new FormData();
+                          fd.append("file", file);
+                          const res = await fetch("/api/upload", { method: "POST", body: fd });
+                          const data = await res.json();
+                          if (res.ok && data.url) {
+                            setFormData({ ...formData, image: data.url });
+                            toast.success("Image uploaded!");
+                          } else {
+                            toast.error(data.error || "Upload failed");
+                          }
+                        } catch {
+                          toast.error("Upload failed");
+                        } finally {
+                          setUploading(false);
+                        }
+                      }}
+                    />
+                    {uploading ? (
+                      <><Loader2 className="w-6 h-6 text-amber-400 animate-spin" /><span className="text-white/50 text-sm mt-2">Uploading...</span></>
+                    ) : (
+                      <><Upload className="w-6 h-6 text-white/40" /><span className="text-white/50 text-sm mt-2">Click to upload (max 5MB)</span></>
+                    )}
+                  </label>
+                </div>
+                <div>
+                  <Label className="text-white/70">Or paste Image URL</Label>
                   <Input
                     value={formData.image}
                     onChange={(e) =>
@@ -302,7 +339,6 @@ export default function NewProductPage() {
                     }
                     className="mt-1 bg-white/5 border-white/10 text-white"
                     placeholder="https://..."
-                    required
                   />
                 </div>
                 {formData.image && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ShoppingCart, Heart, Search, Menu, X, User, ChevronDown, LogOut, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,19 +16,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { authClient, useSession } from "@/lib/auth-client";
+import { useSession, signOut } from "@/lib/auth-client";
 import { toast } from "sonner";
 
 interface HeaderProps {
   onCartOpen: () => void;
   onWishlistOpen: () => void;
   onSearchOpen: () => void;
+  onAuthOpen?: () => void;
+  dark?: boolean;
 }
 
 export default function Header({
   onCartOpen,
   onWishlistOpen,
   onSearchOpen,
+  dark = false,
 }: HeaderProps) {
   const router = useRouter();
   const { data: session, refetch } = useSession();
@@ -37,32 +41,31 @@ export default function Header({
 
   const mainNavItems = [
     { label: "Home", href: "/" },
-    { label: "New Arrivals", href: "#" },
+    { label: "New Arrivals", href: "/new-arrivals" },
+    { label: "Deals", href: "/deals" },
     { label: "Brands", href: "/brands" },
     { label: "Collections", href: "/collections" },
-    { label: "Women", href: "#" },
-    { label: "Men", href: "#" },
+    { label: "Women", href: "/categories/women" },
+    { label: "Men", href: "/categories/men" },
   ];
 
   const moreItems = [
     { label: "Blog", href: "/blog" },
     { label: "Explore Brands", href: "/explore-brands" },
-    { label: "Learn More", href: "/learn-more" },
-    { label: "Sale", href: "#" },
-    { label: "Accessories", href: "#" },
-    { label: "Kids", href: "#" },
-    { label: "Sports", href: "#" },
+    { label: "Sale", href: "/sale" },
+    { label: "Gift Cards", href: "/gift-cards" },
+    { label: "Rewards", href: "/rewards" },
+    { label: "Lookbook", href: "/lookbook" },
+    { label: "Size Guide", href: "/size-guide" },
   ];
 
   const handleSignOut = async () => {
-    const { error } = await authClient.signOut();
-    if (error?.code) {
-      toast.error("Failed to sign out. Please try again.");
-    } else {
-      localStorage.removeItem("bearer_token");
-      refetch();
+    try {
+      await signOut();
       toast.success("Signed out successfully");
       router.push("/");
+    } catch {
+      toast.error("Failed to sign out. Please try again.");
     }
   };
 
@@ -74,10 +77,10 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className={`sticky top-0 z-50 w-full border-b backdrop-blur supports-backdrop-filter:bg-opacity-60 ${dark ? "bg-[#0f0f0f]/95 border-white/10 text-white" : "bg-background/95 border-border"}`}>
       {/* Top banner with promo code */}
-      <div className="bg-gradient-to-r from-black via-[#1BA6A6] to-black text-white text-center py-2.5 text-sm font-medium">
-        <span className="hidden sm:inline">🎉 Free shipping on orders over $100 | </span>
+      <div className="bg-linear-to-r from-black via-[#1BA6A6] to-black text-white text-center py-2.5 text-sm font-medium">
+        <span className="hidden sm:inline">🎉 Free shipping on orders over ₹999 | </span>
         <span className="font-bold">Use code: <span className="text-[#FFD93D] text-base">FYNDS20</span></span>
         <span className="hidden sm:inline"> for 20% OFF 🎁</span>
       </div>
@@ -97,9 +100,14 @@ export default function Header({
 
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Fashion<span className="text-primary">Fynds</span>
-            </h1>
+            <Image
+              src="/logo.jpg"
+              alt="FashionFynds"
+              width={160}
+              height={48}
+              className={`h-10 w-auto object-contain ${dark ? "brightness-0 invert" : "mix-blend-multiply dark:mix-blend-screen"}`}
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -108,7 +116,7 @@ export default function Header({
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-sm font-medium transition-all hover:text-[#1BA6A6] relative group"
+                className={`text-sm font-medium transition-all hover:text-[#1BA6A6] relative group ${dark ? "text-white/80" : ""}`}
               >
                 {item.label}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#1BA6A6] transition-all duration-300 group-hover:w-full" />
@@ -118,7 +126,7 @@ export default function Header({
             {/* More dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="text-sm font-medium transition-all hover:text-[#1BA6A6] relative group flex items-center gap-1">
+                  <button className={`text-sm font-medium transition-all hover:text-[#1BA6A6] relative group flex items-center gap-1 ${dark ? "text-white/80" : ""}`}>
                   More
                   <ChevronDown className="h-4 w-4" />
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#1BA6A6] transition-all duration-300 group-hover:w-full" />
@@ -146,14 +154,14 @@ export default function Header({
           >
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products, brands..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={onSearchOpen}
-                className="pl-10 w-full"
-              />
+                <Input
+                  type="search"
+                  placeholder="Search products, brands..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={onSearchOpen}
+                  className={`pl-10 w-full ${dark ? "bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-[#1BA6A6]" : ""}`}
+                />
             </div>
           </form>
 
@@ -195,6 +203,12 @@ export default function Header({
                     <Link href="/account/orders" className="cursor-pointer">
                       <Package className="mr-2 h-4 w-4" />
                       Orders
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/wishlist" className="cursor-pointer">
+                      <Heart className="mr-2 h-4 w-4" />
+                      Wishlist
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -280,6 +294,13 @@ export default function Header({
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Orders
+                </Link>
+                <Link
+                  href="/wishlist"
+                  className="text-sm font-medium transition-colors hover:text-[#1BA6A6] text-left"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Wishlist
                 </Link>
                 <button
                   onClick={() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,7 +65,7 @@ interface Brand {
   name: string;
 }
 
-export default function InventoryPage() {
+function InventoryContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -382,5 +382,26 @@ export default function InventoryPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense fallback={
+        <div className="space-y-6">
+          <div className="h-8 w-48 bg-white/10 rounded animate-pulse" />
+          <Card className="bg-[#12121a] border-white/5">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-16 bg-white/5 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+    }>
+      <InventoryContent />
+    </Suspense>
   );
 }

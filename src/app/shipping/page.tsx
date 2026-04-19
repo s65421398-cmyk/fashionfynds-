@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -24,27 +23,27 @@ export default function ShippingPage() {
   const shippingOptions = [
     {
       name: "Standard Shipping",
-      time: "3-5 Business Days",
-      cost: "Free on orders $50+",
-      description: "Reliable delivery for most orders"
+      time: "4-7 Business Days",
+      cost: "Free on orders ₹999+",
+      description: "Pan-India delivery via courier partners"
     },
     {
       name: "Express Shipping",
-      time: "1-2 Business Days",
-      cost: "$15.00",
+      time: "2-3 Business Days",
+      cost: "₹199",
       description: "Fast delivery for urgent orders"
     },
     {
-      name: "Next Day Delivery",
-      time: "1 Business Day",
-      cost: "$25.00",
-      description: "Order by 2PM for next day delivery"
+      name: "Same Day Delivery",
+      time: "Same Day (select cities)",
+      cost: "₹299",
+      description: "Order by 12PM for same day delivery"
     },
     {
-      name: "International Shipping",
-      time: "7-14 Business Days",
-      cost: "Calculated at checkout",
-      description: "Available to 45+ countries"
+      name: "COD (Cash on Delivery)",
+      time: "4-7 Business Days",
+      cost: "₹49 handling fee",
+      description: "Pay cash when your order arrives"
     }
   ];
 
@@ -78,7 +77,6 @@ export default function ShippingPage() {
   ];
 
   return (
-    <ShopProvider>
       <div className="min-h-screen bg-background">
         <Header
           onCartOpen={() => setCartOpen(true)}
@@ -113,7 +111,7 @@ export default function ShippingPage() {
                       <Truck className="w-8 h-8 text-green-600" />
                     </div>
                     <h3 className="font-bold mb-1">Free Shipping</h3>
-                    <p className="text-sm text-muted-foreground">On orders over $50</p>
+                    <p className="text-sm text-muted-foreground">On orders over ₹999</p>
                   </div>
                   <div className="text-center">
                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -178,7 +176,7 @@ export default function ShippingPage() {
                       <ul className="text-sm text-blue-800 space-y-1">
                         <li>• Processing time: 1-2 business days before shipment</li>
                         <li>• Tracking number provided once order ships</li>
-                        <li>• Signature may be required for orders over $500</li>
+                        <li>• Signature may be required for orders over ₹25,000</li>
                         <li>• PO boxes accepted for standard shipping only</li>
                         <li>• Business days exclude weekends and holidays</li>
                       </ul>
@@ -385,7 +383,6 @@ export default function ShippingPage() {
           onClose={() => setCheckoutOpen(false)}
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-      </div>
-    </ShopProvider>
+      </div>
   );
 }

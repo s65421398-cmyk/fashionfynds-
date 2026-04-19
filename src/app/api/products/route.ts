@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { products, brands, categories } from '@/db/schema';
-import { eq, like, and, or, desc } from 'drizzle-orm';
+import { eq, and, or, desc } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map(s => s.trim()).filter(Boolean);
+
+async function requireAdmin(): Promise<NextResponse | null> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+  if (ADMIN_EMAILS.length > 0 && !ADMIN_EMAILS.includes(session.user.email)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return null;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -82,15 +97,16 @@ export async function GET(request: NextRequest) {
       .offset(offset);
 
     return NextResponse.json(results, { status: 200 });
-  } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error as Error).message 
-    }, { status: 500 });
-  }
+    } catch (error) {
+      console.error('GET /api/products error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { 
@@ -175,24 +191,19 @@ export async function POST(request: NextRequest) {
       .returning();
 
     return NextResponse.json(newProduct[0], { status: 201 });
-  } catch (error) {
-    console.error('POST error:', error);
-    
-    // Handle unique constraint violation for slug
-    if ((error as Error).message.includes('UNIQUE constraint failed')) {
-      return NextResponse.json({ 
-        error: "A product with this slug already exists",
-        code: "DUPLICATE_SLUG" 
-      }, { status: 400 });
+    } catch (error) {
+      console.error('POST /api/products error:', error);
+      if ((error as Error).message?.includes('UNIQUE constraint failed')) {
+        return NextResponse.json({ error: "A product with this slug already exists", code: "DUPLICATE_SLUG" }, { status: 400 });
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error as Error).message 
-    }, { status: 500 });
-  }
 }
 
 export async function PUT(request: NextRequest) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
@@ -279,24 +290,19 @@ export async function PUT(request: NextRequest) {
       .returning();
 
     return NextResponse.json(updated[0], { status: 200 });
-  } catch (error) {
-    console.error('PUT error:', error);
-    
-    // Handle unique constraint violation for slug
-    if ((error as Error).message.includes('UNIQUE constraint failed')) {
-      return NextResponse.json({ 
-        error: "A product with this slug already exists",
-        code: "DUPLICATE_SLUG" 
-      }, { status: 400 });
+    } catch (error) {
+      console.error('PUT /api/products error:', error);
+      if ((error as Error).message?.includes('UNIQUE constraint failed')) {
+        return NextResponse.json({ error: "A product with this slug already exists", code: "DUPLICATE_SLUG" }, { status: 400 });
+      }
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error as Error).message 
-    }, { status: 500 });
-  }
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
@@ -329,10 +335,8 @@ export async function DELETE(request: NextRequest) {
       message: 'Product deleted successfully',
       product: deleted[0]
     }, { status: 200 });
-  } catch (error) {
-    console.error('DELETE error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error as Error).message 
-    }, { status: 500 });
-  }
+    } catch (error) {
+      console.error('DELETE /api/products error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }

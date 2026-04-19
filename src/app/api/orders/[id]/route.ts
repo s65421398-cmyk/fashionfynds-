@@ -1,57 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { orders, orderItems, session } from '@/db/schema';
+import { orders, orderItems } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-
-async function authenticateRequest(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.substring(7);
-
-  try {
-    const sessionRecord = await db
-      .select()
-      .from(session)
-      .where(eq(session.token, token))
-      .limit(1);
-
-    if (sessionRecord.length === 0) {
-      return null;
-    }
-
-    const userSession = sessionRecord[0];
-
-    if (new Date(userSession.expiresAt) < new Date()) {
-      return null;
-    }
-
-    return { userId: userSession.userId };
-  } catch (error) {
-    console.error('Authentication error:', error);
-    return null;
-  }
-}
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request);
-    
-    if (!user) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Authentication required', code: 'UNAUTHORIZED' },
         { status: 401 }
       );
     }
 
-    const { id } = params;
-
+    const { id } = await params;
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json(
         { error: 'Valid order ID is required', code: 'INVALID_ID' },
@@ -64,47 +31,23 @@ export async function GET(
     const orderRecord = await db
       .select()
       .from(orders)
-      .where(
-        and(
-          eq(orders.id, orderId),
-          eq(orders.userId, user.userId)
-        )
-      )
+      .where(and(eq(orders.id, orderId), eq(orders.userId, session.user.id)))
       .limit(1);
 
     if (orderRecord.length === 0) {
-      const orderExists = await db
-        .select()
-        .from(orders)
-        .where(eq(orders.id, orderId))
-        .limit(1);
-
-      if (orderExists.length === 0) {
-        return NextResponse.json(
-          { error: 'Order not found', code: 'ORDER_NOT_FOUND' },
-          { status: 404 }
-        );
-      }
-
+      // Check if order exists at all to give the right error code
+      const exists = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
       return NextResponse.json(
-        { error: 'Unauthorized access to this order', code: 'FORBIDDEN' },
-        { status: 403 }
+        exists.length === 0
+          ? { error: 'Order not found', code: 'ORDER_NOT_FOUND' }
+          : { error: 'Unauthorized access to this order', code: 'FORBIDDEN' },
+        { status: exists.length === 0 ? 404 : 403 }
       );
     }
 
-    const order = orderRecord[0];
+    const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
 
-    const items = await db
-      .select()
-      .from(orderItems)
-      .where(eq(orderItems.orderId, orderId));
-
-    const orderWithItems = {
-      ...order,
-      items
-    };
-
-    return NextResponse.json(orderWithItems, { status: 200 });
+    return NextResponse.json({ ...orderRecord[0], items }, { status: 200 });
   } catch (error) {
     console.error('GET order error:', error);
     return NextResponse.json(

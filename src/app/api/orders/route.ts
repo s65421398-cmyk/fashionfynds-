@@ -1,43 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { orders, orderItems, session } from '@/db/schema';
+import { orders, orderItems } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
-async function authenticateRequest(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.substring(7);
-
-  try {
-    const sessionResult = await db.select()
-      .from(session)
-      .where(eq(session.token, token))
-      .limit(1);
-
-    if (sessionResult.length === 0) {
-      return null;
-    }
-
-    const userSession = sessionResult[0];
-
-    if (new Date(userSession.expiresAt) < new Date()) {
-      return null;
-    }
-
-    return { id: userSession.userId };
-  } catch (error) {
-    console.error('Authentication error:', error);
-    return null;
-  }
+async function authenticateRequest() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  return session?.user ?? null;
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request);
+    const user = await authenticateRequest();
     if (!user) {
       return NextResponse.json({ 
         error: 'Authentication required',
@@ -69,17 +44,15 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error instanceof Error ? error.message : 'Unknown error')
-    }, { status: 500 });
-  }
+    } catch (error) {
+      console.error('GET /api/orders error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request);
+    const user = await authenticateRequest();
     if (!user) {
       return NextResponse.json({ 
         error: 'Authentication required',
@@ -203,33 +176,36 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (!paymentMethod || typeof paymentMethod !== 'string' || paymentMethod.trim() === '') {
-      return NextResponse.json({ 
-        error: "Payment method is required",
-        code: "MISSING_PAYMENT_METHOD" 
-      }, { status: 400 });
-    }
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (!item.productId || !item.productName || !item.productImage || !item.quantity || !item.price || !item.selectedSize || !item.selectedColor) {
+      if (!paymentMethod || typeof paymentMethod !== 'string' || paymentMethod.trim() === '') {
         return NextResponse.json({ 
-          error: `Item at index ${i} is missing required fields`,
-          code: "INVALID_ITEM" 
+          error: "Payment method is required",
+          code: "MISSING_PAYMENT_METHOD" 
         }, { status: 400 });
       }
-    }
 
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    const orderNumber = `ORD-${timestamp}${random}`;
-    const now = new Date().toISOString();
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (!item.productId || !item.productName || !item.productImage || !item.quantity || !item.price) {
+          return NextResponse.json({ 
+            error: `Item at index ${i} is missing required fields`,
+            code: "INVALID_ITEM" 
+          }, { status: 400 });
+        }
+      }
 
-    const newOrder = await db.insert(orders)
-      .values({
-        userId: user.id,
-        orderNumber,
-        status: 'pending',
+      const VALID_STATUSES = ['pending', 'pending_verification', 'processing', 'shipped', 'delivered', 'cancelled'];
+      const orderStatus = body.status && VALID_STATUSES.includes(body.status) ? body.status : 'pending';
+
+      const timestamp = Date.now();
+      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      const orderNumber = `ORD-${timestamp}${random}`;
+      const now = new Date().toISOString();
+
+      const newOrder = await db.insert(orders)
+        .values({
+          userId: user.id,
+          orderNumber,
+          status: orderStatus,
         subtotal,
         shipping,
         tax,
@@ -263,12 +239,12 @@ export async function POST(request: NextRequest) {
         .values({
           orderId,
           productId: item.productId,
-          productName: item.productName.trim(),
-          productImage: item.productImage.trim(),
-          quantity: item.quantity,
-          price: item.price,
-          selectedSize: item.selectedSize.trim(),
-          selectedColor: item.selectedColor.trim(),
+            productName: item.productName.trim(),
+            productImage: item.productImage.trim(),
+            quantity: item.quantity,
+            price: item.price,
+            selectedSize: (item.selectedSize ?? "One Size").trim(),
+            selectedColor: (item.selectedColor ?? "Default").trim(),
           createdAt: now,
         })
         .returning()
@@ -283,10 +259,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(orderWithItems, { status: 201 });
 
-  } catch (error) {
-    console.error('POST error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error instanceof Error ? error.message : 'Unknown error')
-    }, { status: 500 });
-  }
+    } catch (error) {
+      console.error('POST /api/orders error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }

@@ -1,0 +1,50 @@
+2026-02-19T13:47:45.577Z [console][error] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree.
+2026-02-19T13:47:45.580Z [console][error] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:50:24.047Z [console][error] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree.
+2026-02-19T13:50:24.057Z [console][error] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:51:43.854Z [console][error] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree.
+2026-02-19T13:51:43.856Z [console][error] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:51:44.176Z [console][error] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree.
+2026-02-19T13:51:44.178Z [console][error] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:51:57.814Z [console][error] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree.
+2026-02-19T13:51:57.817Z [console][error] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:47:45.579Z [console][warn] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:50:24.056Z [console][warn] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:51:43.854Z [console][warn] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:51:44.177Z [console][warn] [Fast Refresh] performing full reload because your application had an unrecoverable error
+2026-02-19T13:51:57.816Z [console][warn] [Fast Refresh] performing full reload because your application had an unrecoverable error

@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { Search, X, SlidersHorizontal } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { products } from "@/lib/products";
 import { Product } from "@/types/product";
+import { formatPrice } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -37,10 +39,10 @@ export default function SearchModal({
   const categories = ["All", "Shoes", "Bags", "Outerwear", "Dresses", "Activewear", "Accessories", "Tops", "Bottoms"];
   const priceRanges = [
     { label: "All Prices", value: "all" },
-    { label: "Under $50", value: "0-50" },
-    { label: "$50 - $100", value: "50-100" },
-    { label: "$100 - $200", value: "100-200" },
-    { label: "Over $200", value: "200+" },
+    { label: "Under ₹4,150", value: "0-50" },
+    { label: "₹4,150 - ₹8,300", value: "50-100" },
+    { label: "₹8,300 - ₹16,600", value: "100-200" },
+    { label: "Over ₹16,600", value: "200+" },
   ];
 
   const filteredProducts = useMemo(() => {
@@ -96,9 +98,12 @@ export default function SearchModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-        <div className="flex flex-col h-full">
-          {/* Search Header */}
+<DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <VisuallyHidden>
+            <DialogTitle>Search Products</DialogTitle>
+          </VisuallyHidden>
+          <div className="flex flex-col h-full">
+            {/* Search Header */}
           <div className="p-6 border-b space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -225,11 +230,11 @@ export default function SearchModal({
                       </h4>
                       <div className="flex items-center gap-2">
                         <span className="font-bold">
-                          ${product.price.toFixed(2)}
+                          {formatPrice(product.price)}
                         </span>
                         {product.originalPrice && (
                           <span className="text-xs text-muted-foreground line-through">
-                            ${product.originalPrice.toFixed(2)}
+                            {formatPrice(product.originalPrice)}
                           </span>
                         )}
                       </div>

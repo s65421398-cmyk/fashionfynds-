@@ -8,31 +8,31 @@ const trendingProducts = [
   {
     name: "Vintage Denim Jacket",
     brand: "Levi's",
-    price: "$89.99",
+    price: "₹3,999",
     badge: "🔥 Selling Fast",
   },
   {
     name: "Minimalist Leather Bag",
     brand: "Fossil",
-    price: "$129.99",
+    price: "₹8,499",
     badge: "⚡ Top Rated",
   },
   {
     name: "Sustainable Cotton Tee",
     brand: "Patagonia",
-    price: "$45.00",
+    price: "₹2,499",
     badge: "🌿 Eco-Friendly",
   },
   {
     name: "Urban Streetwear Hoodie",
     brand: "Nike",
-    price: "$79.99",
+    price: "₹4,999",
     badge: "🔥 Best Seller",
   },
   {
     name: "Classic White Sneakers",
     brand: "Adidas",
-    price: "$95.00",
+    price: "₹6,999",
     badge: "⭐ Trending",
   },
 ];

@@ -2,15 +2,48 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer } from "better-auth/plugins";
 import { NextRequest } from 'next/server';
-import { headers } from "next/headers"
+import { headers } from "next/headers";
 import { db } from "@/db";
+import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
  
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "sqlite",
 	}),
 	emailAndPassword: {    
-		enabled: true
+		enabled: true,
+		requireEmailVerification: true,
+		sendResetPassword: async ({ user, url, token }, request) => {
+			void sendPasswordResetEmail(user.email, user.name, url);
+		},
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		autoSignInAfterVerification: true,
+		sendVerificationEmail: async ({ user, url, token }, request) => {
+			void sendVerificationEmail(user.email, user.name, url);
+		},
+	},
+	databaseHooks: {
+		user: {
+			create: {
+				after: async (user) => {
+					if (user?.email && user?.name) {
+						void sendWelcomeEmail(user.email, user.name);
+					}
+				},
+			},
+		},
+	},
+	socialProviders: {
+		google: {
+			clientId: process.env.GOOGLE_CLIENT_ID || "",
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+		},
+		facebook: {
+			clientId: process.env.FACEBOOK_CLIENT_ID || "",
+			clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+		},
 	},
 	plugins: [bearer()]
 });

@@ -23,9 +23,20 @@ export default function Newsletter() {
     }
   }, [isSubscribed]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "newsletter_footer" }),
+      });
+      const data = await res.json();
+
       // Track newsletter signup across all platforms
       trackEmailEvent('signup', {
         email_provider: email.split('@')[1],
@@ -38,7 +49,11 @@ export default function Newsletter() {
       });
       
       setIsSubscribed(true);
-      toast.success("Check your email for your welcome code!");
+      toast.success(data.message || "Check your email for your welcome code!");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -54,7 +69,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-r from-[#FF6B6B] to-[#FF8080] relative overflow-hidden">
+    <section className="py-20 bg-linear-to-r from-[#FF6B6B] to-[#FF8080] relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white blur-3xl"></div>

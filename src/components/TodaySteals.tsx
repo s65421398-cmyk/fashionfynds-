@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { Product } from "@/types/product";
+import { formatPrice } from "@/lib/utils";
 
 interface TodayStealsProps {
   onProductClick: (product: Product) => void;
@@ -14,8 +15,8 @@ const stealsProducts: Product[] = [
   {
     id: "steal-1",
     name: "Vintage Denim Jacket",
-    price: 59.99,
-    originalPrice: 99.99,
+    price: 2999,
+    originalPrice: 4999,
     image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
     brand: "Vintage Revival",
     category: "women",
@@ -28,8 +29,8 @@ const stealsProducts: Product[] = [
   {
     id: "steal-2",
     name: "Boho Maxi Dress",
-    price: 64.99,
-    originalPrice: 99.99,
+    price: 3499,
+    originalPrice: 5499,
     image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80",
     brand: "Wild Heart",
     category: "women",
@@ -37,13 +38,13 @@ const stealsProducts: Product[] = [
     colors: ["Floral"],
     rating: 4.9,
     reviews: 189,
-    deal: { discount: 35, endsAt: new Date(Date.now() + 6 * 60 * 60 * 1000) },
+    deal: { discount: 36, endsAt: new Date(Date.now() + 6 * 60 * 60 * 1000) },
   },
   {
     id: "steal-3",
     name: "Streetwear Hoodie",
-    price: 39.99,
-    originalPrice: 79.99,
+    price: 1499,
+    originalPrice: 2999,
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80",
     brand: "Urban Rebel",
     category: "men",
@@ -56,8 +57,8 @@ const stealsProducts: Product[] = [
   {
     id: "steal-4",
     name: "Leather Crossbody Bag",
-    price: 54.99,
-    originalPrice: 89.99,
+    price: 3499,
+    originalPrice: 5999,
     image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&q=80",
     brand: "Minimalist Studio",
     category: "accessories",
@@ -65,7 +66,7 @@ const stealsProducts: Product[] = [
     colors: ["Brown", "Black"],
     rating: 4.6,
     reviews: 156,
-    deal: { discount: 40, endsAt: new Date(Date.now() + 5 * 60 * 60 * 1000) },
+    deal: { discount: 42, endsAt: new Date(Date.now() + 5 * 60 * 60 * 1000) },
   },
 ];
 
@@ -157,10 +158,10 @@ export default function TodaySteals({ onProductClick }: TodayStealsProps) {
                 <h3 className="font-semibold mb-2 line-clamp-1">{product.name}</h3>
                 
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg font-bold">${product.price}</span>
+                  <span className="text-lg font-bold">{formatPrice(product.price)}</span>
                   {product.originalPrice && (
                     <span className="text-sm text-muted-foreground line-through">
-                      ${product.originalPrice}
+                      {formatPrice(product.originalPrice)}
                     </span>
                   )}
                 </div>

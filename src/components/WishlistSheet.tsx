@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useShop } from "@/contexts/ShopContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Product } from "@/types/product";
+import { formatPrice } from "@/lib/utils";
 
 interface WishlistSheetProps {
   open: boolean;
@@ -83,10 +84,10 @@ export default function WishlistSheet({
                     </div>
 
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold">${item.price.toFixed(2)}</span>
+                      <span className="font-semibold">{formatPrice(item.price)}</span>
                       {item.originalPrice && (
                         <span className="text-sm text-muted-foreground line-through">
-                          ${item.originalPrice.toFixed(2)}
+                          {formatPrice(item.originalPrice)}
                         </span>
                       )}
                     </div>

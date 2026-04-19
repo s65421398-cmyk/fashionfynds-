@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { orders, orderItems } from '@/db/schema';
-import { eq, desc, like, and, sql } from 'drizzle-orm';
+import { orders } from '@/db/schema';
+import { eq, desc, and, sql } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { sendOrderStatusEmail } from '@/lib/email';
+import { headers } from 'next/headers';
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map(s => s.trim()).filter(Boolean);
+
+async function requireAdmin(): Promise<NextResponse | null> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  if (ADMIN_EMAILS.length > 0 && !ADMIN_EMAILS.includes(session.user.email)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return null;
+}
 
 export async function GET(request: NextRequest) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get('limit') ?? '50'), 100);
@@ -23,27 +40,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let query = db.select().from(orders);
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
-
-    const allOrders = await query
+    const allOrders = await db.select()
+      .from(orders)
+      .where(whereClause)
       .orderBy(desc(orders.createdAt))
       .limit(limit)
       .offset(offset);
 
     return NextResponse.json(allOrders, { status: 200 });
-  } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error instanceof Error ? error.message : 'Unknown error')
-    }, { status: 500 });
-  }
+    } catch (error) {
+      console.error('GET /api/admin/orders error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }
 
 export async function PUT(request: NextRequest) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -89,11 +105,22 @@ export async function PUT(request: NextRequest) {
       .where(eq(orders.id, parseInt(id)))
       .returning();
 
+    // Send order update email if status changed
+    const oldStatus = existingOrder[0].status;
+    if (status && status !== oldStatus && updated[0].shippingEmail) {
+      void sendOrderStatusEmail(
+        updated[0].shippingEmail,
+        updated[0].shippingName || "Customer",
+        updated[0].orderNumber,
+        oldStatus,
+        status,
+        body.message // Optional note from admin that could be added in future frontend updates
+      );
+    }
+
     return NextResponse.json(updated[0], { status: 200 });
-  } catch (error) {
-    console.error('PUT error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error: ' + (error instanceof Error ? error.message : 'Unknown error')
-    }, { status: 500 });
-  }
+    } catch (error) {
+      console.error('PUT /api/admin/orders error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }

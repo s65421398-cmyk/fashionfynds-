@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ShopProvider } from "@/contexts/ShopContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShoppingCart from "@/components/ShoppingCart";
@@ -64,7 +63,6 @@ export default function ProfilePage() {
   };
 
   return (
-    <ShopProvider>
       <div className="min-h-screen bg-background">
         <Header
           onCartOpen={() => setCartOpen(true)}
@@ -324,7 +322,6 @@ export default function ProfilePage() {
           onClose={() => setCheckoutOpen(false)}
         />
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
-      </div>
-    </ShopProvider>
+      </div>
   );
 }

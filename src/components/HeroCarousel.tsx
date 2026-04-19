@@ -70,9 +70,9 @@ export default function HeroCarousel() {
                 <Button 
                   size="lg" 
                   className="text-lg px-8 shadow-lg"
-                  onClick={() => router.push("/explore-brands")}
-                >
-                  Explore Brands
+                onClick={() => router.push("/brands")}
+                  >
+                    Explore Brands
                 </Button>
                 <Button 
                   size="lg" 

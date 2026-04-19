@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
 import { useShop } from "@/contexts/ShopContext";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -100,10 +100,10 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
         {/* Price */}
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+          <span className="text-lg font-bold">{formatPrice(product.price)}</span>
           {product.originalPrice && (
             <span className="text-sm text-muted-foreground line-through">
-              ${product.originalPrice.toFixed(2)}
+              {formatPrice(product.originalPrice)}
             </span>
           )}
         </div>

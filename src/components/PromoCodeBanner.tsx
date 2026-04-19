@@ -35,7 +35,7 @@ export default function PromoCodeBanner() {
               🎉 Special Offer: Get 20% OFF Your First Order!
             </p>
             <p className="text-sm text-white/90">
-              Limited time only • Use code at checkout • Minimum purchase $50
+              Limited time only • Use code at checkout • Minimum purchase ₹500
             </p>
           </div>
 
