@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import { use } from "react";
 import Link from "next/link";
