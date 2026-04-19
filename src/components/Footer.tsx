@@ -61,17 +61,17 @@ export default function Footer() {
               Discover your unique style with curated fashion finds from around the world.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="icon" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
-                <Facebook className="h-4 w-4" />
+              <Button variant="outline" size="icon" aria-label="Visit us on Facebook" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
+                <Facebook className="h-4 w-4" aria-hidden="true" />
               </Button>
-              <Button variant="outline" size="icon" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
-                <Instagram className="h-4 w-4" />
+              <Button variant="outline" size="icon" aria-label="Visit us on Instagram" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
+                <Instagram className="h-4 w-4" aria-hidden="true" />
               </Button>
-              <Button variant="outline" size="icon" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
-                <Twitter className="h-4 w-4" />
+              <Button variant="outline" size="icon" aria-label="Visit us on Twitter" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
+                <Twitter className="h-4 w-4" aria-hidden="true" />
               </Button>
-              <Button variant="outline" size="icon" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
-                <Youtube className="h-4 w-4" />
+              <Button variant="outline" size="icon" aria-label="Visit us on Youtube" className="border-white/20 text-white/70 bg-transparent hover:bg-[#1BA6A6] hover:text-white hover:border-[#1BA6A6] transition-colors">
+                <Youtube className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </div>

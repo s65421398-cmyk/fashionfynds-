@@ -78,6 +78,12 @@ export default function Header({
 
   return (
     <header className={`sticky top-0 z-50 w-full border-b backdrop-blur supports-backdrop-filter:bg-opacity-60 ${dark ? "bg-[#0f0f0f]/95 border-white/10 text-white" : "bg-background/95 border-border"}`}>
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:outline-none"
+      >
+        Skip to main content
+      </a>
       {/* Top banner with promo code */}
       <div className="bg-linear-to-r from-black via-[#1BA6A6] to-black text-white text-center py-2.5 text-sm font-medium">
         <span className="hidden sm:inline">🎉 Free shipping on orders over ₹999 | </span>
@@ -94,8 +100,10 @@ export default function Header({
             size="icon"
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close main menu" : "Open main menu"}
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? <X /> : <Menu aria-hidden="true" />}
           </Button>
 
           {/* Logo */}
@@ -160,6 +168,7 @@ export default function Header({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={onSearchOpen}
+                  aria-label="Search products and brands"
                   className={`pl-10 w-full ${dark ? "bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-[#1BA6A6]" : ""}`}
                 />
             </div>
@@ -181,8 +190,8 @@ export default function Header({
             {session?.user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="relative" aria-label="User account menu">
+                    <User className="h-5 w-5" aria-hidden="true" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -237,8 +246,9 @@ export default function Header({
               size="icon"
               onClick={onWishlistOpen}
               className="relative"
+              aria-label={`Wishlist, ${wishlist.length} items`}
             >
-              <Heart className="h-5 w-5" />
+              <Heart className="h-5 w-5" aria-hidden="true" />
               {wishlist.length > 0 && (
                 <Badge
                   variant="destructive"
@@ -254,8 +264,9 @@ export default function Header({
               size="icon"
               onClick={onCartOpen}
               className="relative"
+              aria-label={`Shopping cart, ${cartCount} items`}
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-5 w-5" aria-hidden="true" />
               {cartCount > 0 && (
                 <Badge
                   variant="destructive"

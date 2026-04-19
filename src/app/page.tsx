@@ -32,6 +32,8 @@ import RecentlyViewed from "@/components/RecentlyViewed";
 import CompareProducts from "@/components/CompareProducts";
 import { addToRecentlyViewed } from "@/components/RecentlyViewed";
 import { Product } from "@/types/product";
+import AIStylist from "@/components/AIStylist";
+import ProblemAlignment from "@/components/ProblemAlignment";
 
 export default function Home() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -53,11 +55,12 @@ export default function Home() {
         onSearchOpen={() => setSearchOpen(true)}
       />
       
-      <main>
+      <main id="main-content" tabIndex={-1} className="outline-none">
         <UrgencyBanner />
         <TrendingTicker />
         <TrendingNowBanner />
         <HeroCarousel />
+        <ProblemAlignment />
         <PromoCodeBanner />
         <TrustBadges />
         <CategoriesSection />
@@ -107,6 +110,7 @@ export default function Home() {
       <LiveChatWidget />
       <BackToTop />
       <CompareProducts onProductClick={handleProductClick} />
+      <AIStylist />
     </div>
   );
 }
