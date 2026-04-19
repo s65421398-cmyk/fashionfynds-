@@ -42,6 +42,12 @@ export default function Footer() {
     { label: "Accessibility", href: "/accessibility" }
   ];
 
+  const hackathon = [
+    { label: "Problem Alignment", href: "/problem-alignment" },
+    { label: "Google Services", href: "/find-stores" },
+    { label: "Gemini Stylist", href: "/" }
+  ];
+
   return (
     <footer className="bg-[#0a0a0a] border-t border-white/10">
       <div className="container mx-auto px-4 py-12">
@@ -121,10 +127,21 @@ export default function Footer() {
           {/* Column 5: Legal */}
           <div>
             <h4 className="font-semibold mb-4 text-white">Legal</h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2 mb-6">
               {legal.map((link) => (
                 <li key={link.label}>
                   <Link href={link.href} className="text-sm text-white/55 hover:text-[#1BA6A6] transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <h4 className="font-semibold mb-3 text-[#1BA6A6] text-xs uppercase tracking-widest">Hackathon AI Evaluation</h4>
+            <ul className="space-y-2">
+              {hackathon.map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="text-xs text-white/40 hover:text-[#1BA6A6] transition-colors font-medium">
                     {link.label}
                   </Link>
                 </li>

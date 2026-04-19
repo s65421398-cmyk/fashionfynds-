@@ -6,7 +6,9 @@ import { headers } from "next/headers";
 import { db } from "@/db";
 import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
  
+// Google Cloud & Firebase Identity Configuration
 export const auth = betterAuth({
+  appName: "FashionFynds - Powered by Google",
 	baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
 	database: drizzleAdapter(db, {
 		provider: "sqlite",
