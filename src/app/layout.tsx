@@ -26,6 +26,7 @@ export default function RootLayout({
 }>) {
   const ga4Id = process.env.NEXT_PUBLIC_GA4_ID;
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const isBuild = process.env.NODE_ENV === 'production' && !process.env.NEXT_RUNTIME;
 
   return (
     <html lang="en">
@@ -57,7 +58,7 @@ export default function RootLayout({
         />
 
         {/* Google Analytics 4 */}
-        {ga4Id && (
+        {!isBuild && ga4Id && (
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
@@ -79,7 +80,7 @@ export default function RootLayout({
         )}
 
         {/* Google Tag Manager */}
-        {gtmId && (
+        {!isBuild && gtmId && (
           <Script
             id="gtm-init"
             strategy="afterInteractive"
@@ -102,7 +103,7 @@ export default function RootLayout({
         <CookieConsent />
 
         {/* Google Tag Manager noscript fallback */}
-        {gtmId && (
+        {!isBuild && gtmId && (
           <noscript>
             <iframe
               src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
@@ -116,27 +117,26 @@ export default function RootLayout({
         {/* Analytics Provider wraps all tracking utilities */}
         <AnalyticsProvider>
           <ShopProvider>
-            <Suspense fallback={null}>
-              <PageTracker />
-            </Suspense>
-            <ScrollDepthTracker />
-
-            {/* Facebook Pixel */}
-            <FacebookPixel />
-
-            {/* Hotjar */}
-            <HotjarTracker />
-
-            <Script
-              src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"
-              strategy="afterInteractive"
-              data-target-origin="*"
-              data-message-type="ROUTE_CHANGE"
-              data-include-search-params="true"
-              data-only-in-iframe="true"
-              data-debug="true"
-              data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
-            />
+            {!isBuild && (
+              <>
+                <Suspense fallback={null}>
+                  <PageTracker />
+                </Suspense>
+                <ScrollDepthTracker />
+                <FacebookPixel />
+                <HotjarTracker />
+                <Script
+                  src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"
+                  strategy="afterInteractive"
+                  data-target-origin="*"
+                  data-message-type="ROUTE_CHANGE"
+                  data-include-search-params="true"
+                  data-only-in-iframe="true"
+                  data-debug="true"
+                  data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
+                />
+              </>
+            )}
 
             {children}
 

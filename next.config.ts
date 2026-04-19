@@ -35,6 +35,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  reactStrictMode: false,
+  trailingSlash: true,
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**" },
