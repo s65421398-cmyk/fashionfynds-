@@ -14,6 +14,8 @@ import { AnalyticsProvider } from '@/contexts/AnalyticsContext';
 import PageTracker from '@/components/trackers/PageTracker';
 import { OrganizationSchema, WebsiteSchema, LocalBusinessSchema } from '@/components/StructuredData';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "FashionFynds - Discover Your Unique Style",
   description: "Shop curated fashion finds from the world's best brands",
