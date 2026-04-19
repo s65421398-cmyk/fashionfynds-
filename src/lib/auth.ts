@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
  
 export const auth = betterAuth({
+	baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
 	database: drizzleAdapter(db, {
 		provider: "sqlite",
 	}),
